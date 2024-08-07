@@ -1,7 +1,13 @@
-const fs = require("fs");
-const path = require("path");
-const { ApolloServer } = require("apollo-server");
-const Query = require("./resolvers/Query");
+import fs from "fs";
+import path from "path";
+import { ApolloServer } from '@apollo/server';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import Query from './resolvers/Query.js'
+import { fileURLToPath } from 'url';
+
+// Helper function to get __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const resolvers = {
   Query,
@@ -12,4 +18,9 @@ const server = new ApolloServer({
   resolvers,
 });
 
-server.listen().then(({ url }) => console.log(`Server is running on ${url}`));
+const { url } = await startStandaloneServer(server, {
+  listen: { port: 4000 },
+});
+
+console.log(`🚀  Server ready at: ${url}`);
+

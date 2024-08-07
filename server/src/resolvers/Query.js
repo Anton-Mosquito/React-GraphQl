@@ -14,6 +14,6 @@ function movies(parent, args) {
   };
 }
 
-module.exports = {
+export default {
   movies,
 };
