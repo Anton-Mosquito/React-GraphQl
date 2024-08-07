@@ -32,6 +32,7 @@
       "ygqygq2.turbo-print-log"
       "vscode-icons-team.vscode-icons"
       "Vue.volar"
+      "dsznajder.es7-react-js-snippets"
     ];
 
     # Enable previews
