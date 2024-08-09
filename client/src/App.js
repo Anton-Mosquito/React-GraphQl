@@ -8,22 +8,30 @@ import Box from "@mui/material/Box";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Navigation } from "./components";
 import { Home, Settings, Recommend } from "./pages";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 
 function App() {
+  const client = new ApolloClient({
+    uri: "http://localhost:4000/",
+    cache: new InMemoryCache(),
+  });
+
   return (
-    <BrowserRouter>
-      <CssBaseline />
-      <Navigation />
-      <Box sx={{ backgroundColor: (theme) => theme.palette.grey(100) }}>
-        <Container maxWidth="xl">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="settings" element={<Settings />} />
-            <Route path="recommend" element={<Recommend />} />
-          </Routes>
-        </Container>
-      </Box>
-    </BrowserRouter>
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        <CssBaseline />
+        <Navigation />
+        <Box sx={{ backgroundColor: (theme) => theme.palette.grey(100) }}>
+          <Container maxWidth="xl">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="settings" element={<Settings />} />
+              <Route path="recommend" element={<Recommend />} />
+            </Routes>
+          </Container>
+        </Box>
+      </BrowserRouter>
+    </ApolloProvider>
   );
 }
 
