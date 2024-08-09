@@ -5,7 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
-import CardMenu from "../CardMenu";
+import CardMenu from "../MovieCard/components/CardMenu";
 
 const MovieCardSelected = ({ movie, onCardDelete }) => {
   return (

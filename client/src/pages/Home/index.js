@@ -4,7 +4,7 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import { MovieCard } from "../../components";
 import { useQuery } from "@apollo/client";
-import {MOVIES_QUERY} from './queries'
+import { MOVIES_QUERY } from "./queries.js";
 
 const SelectedMovies = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -22,6 +22,7 @@ const Home = () => {
   if (error) {
     return "Error";
   }
+
   return (
     <Box sx={{ flexGrow: 1, marginTop: 2 }}>
       <Grid container spacing={2}>
