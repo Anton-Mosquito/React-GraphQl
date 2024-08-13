@@ -5,7 +5,6 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import CardMenu from "./components/CardMenu";
-
 import { styled } from "@mui/material/styles";
 
 const CardInfo = styled(CardContent)(({ theme }) => ({
