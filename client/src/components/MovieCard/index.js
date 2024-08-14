@@ -6,6 +6,8 @@ import Typography from "@mui/material/Typography";
 import MenuItem from "@mui/material/MenuItem";
 import CardMenu from "./components/CardMenu";
 import { styled } from "@mui/material/styles";
+import { Box } from "@mui/material";
+import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
 
 const CardInfo = styled(CardContent)(({ theme }) => ({
   "&:last-child": {
@@ -13,11 +15,29 @@ const CardInfo = styled(CardContent)(({ theme }) => ({
   },
 }));
 
+const PlusIcon = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  bottom: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  opacity: 0,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "rgba(255, 255, 255, .6)",
+  cursor: "pointer",
+  "&:hover": {
+    opacity: 1,
+  },
+}));
+
 const MovieCard = ({ movie, onCardSelect }) => {
   return (
     <Card sx={{ maxWidth: 250, position: "relative" }}>
       <CardMenu>
-        <MenuItem onClick={onCardSelect}>Select</MenuItem>
+        <MenuItem onClick={() => onCardSelect(movie)}>Select</MenuItem>
       </CardMenu>
       <CardMedia
         component="img"
@@ -25,6 +45,18 @@ const MovieCard = ({ movie, onCardSelect }) => {
         image={movie.image}
         alt={movie.title}
       />
+
+      <Box sx={{ position: "relative" }}>
+        <CardMedia
+          component="img"
+          height="250"
+          image={movie.image}
+          alt={movie.title}
+        />
+        <PlusIcon onClick={() => onCardSelect(movie)}>
+          <AddBoxOutlinedIcon sx={{ fontSize: 80 }} />
+        </PlusIcon>
+      </Box>
       <CardInfo>
         <Typography variant="h5" color="text.secondary" component="div">
           {movie.title}
