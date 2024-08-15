@@ -2,7 +2,7 @@
 const Recommend = () => {
     return (
         <>
-            Recommend
+            I recommend
         </>
     )
 }
