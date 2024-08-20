@@ -10,4 +10,10 @@ const getPopular = async (page) => {
   return new Movies(result.data);
 };
 
-export { getPopular };
+const getDetails = (id) => {
+  return axios.get(
+    `${API_BASE_URL}movie/${id}?api_key=${API_KEY}&language=en-US`
+  );
+};
+
+export { getPopular, getDetails };

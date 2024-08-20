@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import PropTypes from "prop-types";
 import Typography from "@mui/material/Typography";
@@ -12,6 +12,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Alert from "@mui/material/Alert";
 import CloseIcon from "@mui/icons-material/Close";
+import { CONFIRM_TIMEOUT } from "../../const";
+import SocialShare from '../SocialShare'
 
 const style = {
   position: "absolute",
@@ -27,6 +29,18 @@ const style = {
 
 const ConfirmModal = ({ open, url, title, onClose }) => {
   const [openAlert, setOpenAlert] = useState(false);
+
+  useEffect(() => {
+    let timer;
+
+    if (openAlert) {
+      timer = setTimeout(() => {
+        setOpenAlert(false);
+      }, CONFIRM_TIMEOUT);
+    }
+
+    return () => clearTimeout(timer);
+  }, [openAlert]);
 
   return (
     <Modal
@@ -56,9 +70,15 @@ const ConfirmModal = ({ open, url, title, onClose }) => {
             value={url}
           />
 
-          <IconButton sx={{ p: "10px" }} aria-label="preivew">
+          <IconButton
+            sx={{ p: "10px" }}
+            aria-label="preivew"
+            href={url}
+            target="_blank"
+          >
             <VisibilityIcon />
           </IconButton>
+
           <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
 
           <CopyToClipboard text={url} onCopy={() => setOpenAlert(true)}>
@@ -71,6 +91,12 @@ const ConfirmModal = ({ open, url, title, onClose }) => {
             </IconButton>
           </CopyToClipboard>
         </Paper>
+
+        <Typography id="modal-modal-title" variant="h6" component="h3">
+          Share with friends
+        </Typography>
+
+        <SocialShare url={url} title={title} />
 
         {openAlert ? (
           <Alert
@@ -86,7 +112,7 @@ const ConfirmModal = ({ open, url, title, onClose }) => {
                 <CloseIcon fontSize="inherit" />
               </IconButton>
             }
-            sx={{ mb: 2 }}
+            sx={{ mt: 2 }}
           >
             Copied!
           </Alert>

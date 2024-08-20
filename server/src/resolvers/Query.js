@@ -1,4 +1,5 @@
-import { getPopular } from "../modules/movies/index.js";
+import { getPopular, getDetails } from "../modules/movies/index.js";
+import { Movie } from '../modules/movies/entities/Movie.js'
 
 async function movies(parent, args) {
   const data = await getPopular(args.page);
@@ -6,6 +7,15 @@ async function movies(parent, args) {
   return data;
 }
 
+async function moviesByIds(parent, { ids }) {
+  const requests = ids.map((id) => getDetails(id));
+  const data = await Promise.all(requests);
+  const movies = data.map(({ data }) => new Movie(data))
+
+  return movies
+}
+
 export default {
   movies,
+  moviesByIds
 };
