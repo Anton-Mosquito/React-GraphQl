@@ -16,12 +16,25 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useState } from "react";
+import { useState, useContext, useCallback } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { Link } from "@mui/material";
+import { AppContext } from "../../context/appContext";
+import { LOCALES } from "../../const";
 
 const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const { state, dispatch } = useContext(AppContext);
+
+  const setLanguage = useCallback(
+    (locale) => {
+      dispatch({
+        type: "setLocale",
+        locale,
+      });
+    },
+    [dispatch]
+  );
 
   const toggleDrawer = (open) => (event) => {
     if (
@@ -73,6 +86,24 @@ const Navigation = () => {
               Movie recommendation
             </Typography>
           </Link>
+          <Box>
+            {state.locale}
+            <Button
+              disabled={state.locale === LOCALES.ENGLISH}
+              sx={{ my: 2, color: "white" }}
+              onClick={() => setLanguage(LOCALES.ENGLISH)}
+            >
+              ENGLISH
+            </Button>
+
+            <Button
+              disabled={state.locale === LOCALES.UKRANIAN}
+              sx={{ my: 2, color: "white" }}
+              onClick={() => setLanguage(LOCALES.UKRANIAN)}
+            >
+              Українська
+            </Button>
+          </Box>
           <Box sx={{ display: { xs: "none", lg: "flex" } }}>
             <Button
               component={RouterLink}
