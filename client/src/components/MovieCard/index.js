@@ -7,7 +7,7 @@ import MenuItem from "@mui/material/MenuItem";
 import CardMenu from "./components/CardMenu";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/material";
-import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined'
+import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 
 const CardInfo = styled(CardContent)(({ theme }) => ({
   "&:last-child": {
@@ -33,18 +33,14 @@ const PlusIcon = styled(Box)(({ theme }) => ({
   },
 }));
 
-const MovieCard = ({ movie, onCardSelect }) => {
+const MovieCard = ({ movie, onCardSelect, isPreviewMode }) => {
   return (
     <Card sx={{ maxWidth: 250, position: "relative" }}>
-      <CardMenu>
-        <MenuItem onClick={() => onCardSelect(movie)}>Select</MenuItem>
-      </CardMenu>
-      <CardMedia
-        component="img"
-        height="250"
-        image={movie.image}
-        alt={movie.title}
-      />
+      {!isPreviewMode && (
+        <CardMenu>
+          <MenuItem onClick={() => onCardSelect(movie)}>Select</MenuItem>
+        </CardMenu>
+      )}
 
       <Box sx={{ position: "relative" }}>
         <CardMedia
@@ -53,9 +49,11 @@ const MovieCard = ({ movie, onCardSelect }) => {
           image={movie.image}
           alt={movie.title}
         />
-        <PlusIcon onClick={() => onCardSelect(movie)}>
-          <AddBoxOutlinedIcon sx={{ fontSize: 80 }} />
-        </PlusIcon>
+        {!isPreviewMode && (
+          <PlusIcon onClick={() => onCardSelect(movie)}>
+            <AddBoxOutlinedIcon sx={{ fontSize: 80 }} />
+          </PlusIcon>
+        )}
       </Box>
       <CardInfo>
         <Typography variant="h5" color="text.secondary" component="div">
@@ -76,6 +74,7 @@ MovieCard.propTypes = {
     releaseDate: PropTypes.string,
   }).isRequired,
   onCardSelect: PropTypes.func,
+  isPreviewMode: PropTypes.bool
 };
 
 export default MovieCard;
