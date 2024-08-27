@@ -12,8 +12,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Alert from "@mui/material/Alert";
 import CloseIcon from "@mui/icons-material/Close";
+import { FormattedMessage } from "react-intl";
 import { CONFIRM_TIMEOUT } from "../../const";
-import SocialShare from '../SocialShare'
+import SocialShare from "../SocialShare";
 
 const style = {
   position: "absolute",
@@ -93,7 +94,7 @@ const ConfirmModal = ({ open, url, title, onClose }) => {
         </Paper>
 
         <Typography id="modal-modal-title" variant="h6" component="h3">
-          Share with friends
+          <FormattedMessage id="share_with_friends" />
         </Typography>
 
         <SocialShare url={url} title={title} />
@@ -114,7 +115,7 @@ const ConfirmModal = ({ open, url, title, onClose }) => {
             }
             sx={{ mt: 2 }}
           >
-            Copied!
+            <FormattedMessage id="copied" />
           </Alert>
         ) : null}
       </Box>

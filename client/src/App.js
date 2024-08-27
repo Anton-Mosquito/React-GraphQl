@@ -5,7 +5,7 @@ import "@fontsource/roboto/700.css";
 import CssBaseline from "@mui/material/CssBaseline";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { Navigation } from "./components";
 import { Home, Settings, Recommend } from "./pages";
 import {
@@ -17,7 +17,8 @@ import {
   from,
 } from "@apollo/client";
 import { useContext } from "react";
-import { AppContext } from "./context/appContext";
+import { AppContext } from "./providers/appContext";
+import I18nProvider from "./providers/i18n";
 
 function App() {
   const { state } = useContext(AppContext);
@@ -42,8 +43,8 @@ function App() {
   });
 
   return (
-    <ApolloProvider client={client}>
-      <BrowserRouter>
+    <I18nProvider locale={state.locale}>
+      <ApolloProvider client={client}>
         <CssBaseline />
         <Navigation />
         <Box sx={{ backgroundColor: (theme) => theme.palette.grey[100] }}>
@@ -55,8 +56,8 @@ function App() {
             </Routes>
           </Container>
         </Box>
-      </BrowserRouter>
-    </ApolloProvider>
+      </ApolloProvider>
+    </I18nProvider>
   );
 }
 
