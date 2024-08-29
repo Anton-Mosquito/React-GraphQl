@@ -1,6 +1,6 @@
 import {
   getPopular,
-  getDetail,
+  getDetails,
   discoverMovie,
 } from "../modules/movies/index.js";
 import { getList } from "../modules/genres/index.js";
