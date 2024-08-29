@@ -1,8 +1,13 @@
-import { getPopular, getDetails } from "../modules/movies/index.js";
+import {
+  getPopular,
+  getDetail,
+  discoverMovie,
+} from "../modules/movies/index.js";
+import { getList } from "../modules/genres/index.js";
 import { Movie } from "../modules/movies/entities/Movie.js";
 
 async function movies(parent, args, { locale }) {
-  const data = await getPopular(args.page, locale);
+  const data = await discoverMovie(args.filter, locale);
   return data;
 }
 
@@ -14,7 +19,12 @@ async function moviesByIds(parent, { ids }, { locale }) {
   return movies;
 }
 
+async function genres(_, {}, { locale }) {
+  return await getList(locale);
+}
+
 export default {
   movies,
   moviesByIds,
+  genres,
 };
