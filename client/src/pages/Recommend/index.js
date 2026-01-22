@@ -30,11 +30,17 @@ const Recommend = () => {
       <Typography variant="h1" component="h1" gutterBottom>
         {searchParams.get("title")}
       </Typography>
-
       {data?.moviesByIds && (
         <Grid container spacing={2}>
           {data.moviesByIds.map((movie) => (
-            <Grid key={movie.id} item xs={12} sm={6} md={4} lg={3}>
+            <Grid
+              key={movie.id}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 4,
+                lg: 3
+              }}>
               <MovieCard movie={movie} isPreviewMode />
             </Grid>
           ))}

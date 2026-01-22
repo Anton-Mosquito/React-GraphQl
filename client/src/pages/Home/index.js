@@ -37,19 +37,30 @@ const Home = () => {
   return (
     <Box sx={{ flexGrow: 1, marginTop: 2 }}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Paper sx={{ padding: "16px" }}>
             <Filters onSubmit={onSubmit} initialValues={filter} />
           </Paper>
         </Grid>
-        <Grid item xs={12} md={8}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 8
+          }}>
           <Paper>
             <Box sx={{ flexGrow: 1, padding: 1 }}>
               {loading && "Loading..."}
               {data && (
                 <Grid container spacing={2}>
                   {data.movies.results.map((movie) => (
-                    <Grid key={movie.id} item xs={12} sm={6} md={4} lg={3}>
+                    <Grid
+                      key={movie.id}
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4,
+                        lg: 3
+                      }}>
                       <MovieCard movie={movie} onCardSelect={selectMovie} />
                     </Grid>
                   ))}
@@ -69,7 +80,11 @@ const Home = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4
+          }}>
           <SelectedMoviesSection
             selectedMovies={selectedMovies}
             deleteMovie={deleteMovie}
