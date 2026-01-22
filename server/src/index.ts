@@ -12,6 +12,11 @@ import resolvers from './resolvers/index.js';
 import { config } from './config/index.js';
 import { logger } from './utils/index.js';
 import { GraphQLContext } from './types/index.js';
+import {
+  errorHandler,
+  securityHeaders,
+  requestLogger,
+} from './middleware/index.js';
 
 // ES modules compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -50,15 +55,16 @@ async function startApolloServer() {
         path: formattedError.path,
         extensions: formattedError.extensions,
       });
-
       // Don't expose internal errors in production
       if (config.nodeEnv === 'production') {
-        return {
-          message: formattedError.message,
-          extensions: {
-            code: formattedError.extensions?.code,
-          },
-        };
+        if (formattedError.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+          return {
+            message: 'An internal error occurred',
+            extensions: {
+              code: 'INTERNAL_SERVER_ERROR',
+            },
+          };
+        }
       }
 
       return formattedError;
@@ -68,15 +74,32 @@ async function startApolloServer() {
   // Start Apollo Server
   await server.start();
 
-  // Middleware
+  // Apply security headers early
+  app.use(securityHeaders);
+
+  // Request logging in development
+  if (config.nodeEnv === 'development') {
+    app.use(requestLogger);
+  }
+
+  // CORS configuration
+  const corsOptions = {
+    origin:
+      config.nodeEnv === 'production'
+        ? process.env.ALLOWED_ORIGINS?.split(',') || []
+        : '*',
+    credentials: true,
+  };
+
+  // GraphQL endpoint
   app.use(
     '/graphql',
-    cors<cors.CorsRequest>(),
-    express.json(),
+    cors<cors.CorsRequest>(corsOptions),
+    express.json({ limit: '10mb' }),
     expressMiddleware(server, {
       context: async ({ req, res }: ContextParams): Promise<GraphQLContext> => {
         const locale = (req.headers.locale as string) || 'en-US';
-        
+
         return {
           locale,
           req,
@@ -108,6 +131,9 @@ async function startApolloServer() {
   app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../client/build/index.html'));
   });
+
+  // Error handling middleware (must be last)
+  app.use(errorHandler);
 
   // Start server
   await new Promise<void>((resolve) => 

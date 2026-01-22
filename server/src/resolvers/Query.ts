@@ -5,10 +5,14 @@ import {
 import { getList } from '../modules/genres/index.js';
 import { QueryResolvers } from '../types/index.js';
 import { logger } from '../utils/index.js';
+import { validateMovieFilter, validateMovieIds } from '../utils/index.js';
 
 const queryResolvers: QueryResolvers = {
   async movies(_parent, args, context) {
     try {
+      // Validate input
+      validateMovieFilter(args.filter);
+
       logger.debug('Query: movies', { filter: args.filter, locale: context.locale });
       const data = await discoverMovie(args.filter, context.locale);
       return data;
@@ -20,6 +24,9 @@ const queryResolvers: QueryResolvers = {
 
   async moviesByIds(_parent, { ids }, context) {
     try {
+      // Validate input
+      validateMovieIds(ids);
+
       logger.debug('Query: moviesByIds', { ids, locale: context.locale });
       const requests = ids.map((id) => getDetails(id, context.locale));
       const movies = await Promise.all(requests);
