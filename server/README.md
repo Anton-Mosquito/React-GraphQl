@@ -13,12 +13,16 @@ TypeScript-based GraphQL server for The Movie Database (TMDB) API with Apollo Se
 - **Structured logging** with context
 - **Error handling** with custom error types
 - **Health check** endpoint for monitoring
+ - **Native Fetch API** (no external HTTP dependencies)
+ - **Zero external HTTP dependencies** (uses Node.js built-in fetch)
 
 ## 📋 Prerequisites
 
 - Node.js 18.x or higher
 - npm 9.x or higher
 - TMDB API key (get one at https://www.themoviedb.org/settings/api)
+
+Note: Node.js 18+ is required for native Fetch API support.
 
 ## 🔧 Installation
 ```bash

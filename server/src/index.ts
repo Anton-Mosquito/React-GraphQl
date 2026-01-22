@@ -1,22 +1,22 @@
-import fs from 'fs';
-import path from 'path';
-import express from 'express';
-import http from 'http';
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@as-integrations/express4';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import cors from 'cors';
-import { fileURLToPath } from 'url';
-import resolvers from './resolvers/index.js';
-import { config } from './config/index.js';
-import { logger } from './utils/index.js';
-import { GraphQLContext } from './types/index.js';
+import fs from "fs";
+import path from "path";
+import express from "express";
+import http from "http";
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@as-integrations/express5";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
+import cors from "cors";
+import { fileURLToPath } from "url";
+import resolvers from "./resolvers/index.js";
+import { config } from "./config/index.js";
+import { logger } from "./utils/index.js";
+import { GraphQLContext } from "./types/index.js";
 import {
   errorHandler,
   securityHeaders,
   requestLogger,
-} from './middleware/index.js';
+} from "./middleware/index.js";
 
 // ES modules compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -24,8 +24,8 @@ const __dirname = path.dirname(__filename);
 
 // Load GraphQL schema
 const typeDefs = fs.readFileSync(
-  path.join(__dirname, 'schema.graphql'),
-  'utf8'
+  path.join(__dirname, "schema.graphql"),
+  "utf8",
 );
 
 interface ContextParams {
@@ -43,25 +43,25 @@ async function startApolloServer() {
     resolvers: resolvers as any,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageLocalDefault({ 
+      ApolloServerPluginLandingPageLocalDefault({
         embed: true,
-        includeCookies: true 
+        includeCookies: true,
       }),
     ],
     formatError: (formattedError) => {
       // Log errors
-      logger.error('GraphQL Error', {
+      logger.error("GraphQL Error", {
         message: formattedError.message,
         path: formattedError.path,
         extensions: formattedError.extensions,
       });
       // Don't expose internal errors in production
-      if (config.nodeEnv === 'production') {
-        if (formattedError.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+      if (config.nodeEnv === "production") {
+        if (formattedError.extensions?.code === "INTERNAL_SERVER_ERROR") {
           return {
-            message: 'An internal error occurred',
+            message: "An internal error occurred",
             extensions: {
-              code: 'INTERNAL_SERVER_ERROR',
+              code: "INTERNAL_SERVER_ERROR",
             },
           };
         }
@@ -78,27 +78,27 @@ async function startApolloServer() {
   app.use(securityHeaders);
 
   // Request logging in development
-  if (config.nodeEnv === 'development') {
+  if (config.nodeEnv === "development") {
     app.use(requestLogger);
   }
 
   // CORS configuration
   const corsOptions = {
     origin:
-      config.nodeEnv === 'production'
-        ? process.env.ALLOWED_ORIGINS?.split(',') || []
-        : '*',
+      config.nodeEnv === "production"
+        ? process.env.ALLOWED_ORIGINS?.split(",") || []
+        : "*",
     credentials: true,
   };
 
   // GraphQL endpoint
   app.use(
-    '/graphql',
+    "/graphql",
     cors<cors.CorsRequest>(corsOptions),
-    express.json({ limit: '10mb' }),
+    express.json({ limit: "10mb" }),
     expressMiddleware(server, {
       context: async ({ req, res }: ContextParams): Promise<GraphQLContext> => {
-        const locale = (req.headers.locale as string) || 'en-US';
+        const locale = (req.headers.locale as string) || "en-US";
 
         return {
           locale,
@@ -106,38 +106,38 @@ async function startApolloServer() {
           res,
         };
       },
-    })
+    }),
   );
 
   // Static files for client
-  app.use(express.static(path.join(__dirname, '../../client/build')));
-  app.use(express.static('public'));
+  app.use(express.static(path.join(__dirname, "../../client/build")));
+  app.use(express.static("public"));
 
   // Health check endpoint
-  app.get('/health', (_req, res) => {
-    res.json({ 
-      status: 'ok', 
+  app.get("/health", (_req, res) => {
+    res.json({
+      status: "ok",
       timestamp: new Date().toISOString(),
       environment: config.nodeEnv,
     });
   });
 
   // REST test endpoint (optional, can be removed)
-  app.get('/rest', (_req, res) => {
-    res.json({ data: 'rest works' });
+  app.get("/rest", (_req, res) => {
+    res.json({ data: "rest works" });
   });
 
   // Serve client for all other routes
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/build/index.html'));
+  app.get(/.*/, (_req, res) => {
+    res.sendFile(path.join(__dirname, "../../client/build/index.html"));
   });
 
   // Error handling middleware (must be last)
   app.use(errorHandler);
 
   // Start server
-  await new Promise<void>((resolve) => 
-    httpServer.listen({ port: config.port }, resolve)
+  await new Promise<void>((resolve) =>
+    httpServer.listen({ port: config.port }, resolve),
   );
 
   logger.info(`🚀 Server ready at http://localhost:${config.port}/graphql`);
@@ -148,6 +148,6 @@ async function startApolloServer() {
 
 // Start server and handle errors
 startApolloServer().catch((error) => {
-  logger.error('Failed to start server', { error });
+  logger.error("Failed to start server", { error });
   process.exit(1);
 });

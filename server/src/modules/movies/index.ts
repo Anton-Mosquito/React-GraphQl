@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { Movies } from './entities/index.js';
 import { Movie } from './entities/index.js';
 import { config } from '../../config/index.js';
 import { logger } from '../../utils/index.js';
 import { TMDBApiError } from '../../utils/index.js';
+import { createTMDBClient } from '../../utils/index.js';
 import {
   TMDBMoviesResponse,
   TMDBMovie,
@@ -21,16 +21,14 @@ export async function getPopular(
   language: string = 'en-US'
 ): Promise<Movies> {
   try {
-    const response = await axios.get<TMDBMoviesResponse>(
-      `${config.tmdb.apiBaseUrl}movie/popular`,
-      {
-        params: {
-          api_key: config.tmdb.apiKey,
-          language,
-          page,
-        },
-      }
-    );
+    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
+    const response = await tmdbClient.get<TMDBMoviesResponse>('/movie/popular', {
+      params: {
+        api_key: config.tmdb.apiKey,
+        language,
+        page,
+      },
+    });
 
     logger.debug('Fetched popular movies', {
       page,
@@ -40,19 +38,17 @@ export async function getPopular(
 
     return new Movies(response.data);
   } catch (error) {
-    const axiosError = error as any;
     logger.error('Error fetching popular movies', {
       page,
       language,
-      error: axiosError?.message,
-      status: axiosError?.response?.status,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
 
-    throw new TMDBApiError(
-      'Failed to fetch popular movies',
-      axiosError?.response?.status,
-      error
-    );
+    if (error instanceof TMDBApiError) {
+      throw error;
+    }
+
+    throw new TMDBApiError('Failed to fetch popular movies', undefined, error);
   }
 }
 
@@ -67,31 +63,31 @@ export async function getDetails(
   language: string = 'en-US'
 ): Promise<Movie> {
   try {
-    const response = await axios.get<TMDBMovie>(
-      `${config.tmdb.apiBaseUrl}movie/${id}`,
-      {
-        params: {
-          api_key: config.tmdb.apiKey,
-          language,
-        },
-      }
-    );
+    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
+    const response = await tmdbClient.get<TMDBMovie>(`/movie/${id}`, {
+      params: {
+        api_key: config.tmdb.apiKey,
+        language,
+      },
+    });
 
     logger.debug('Fetched movie details', { id, language });
 
     return new Movie(response.data);
   } catch (error) {
-    const axiosError = error as any;
     logger.error('Error fetching movie details', {
       id,
       language,
-      error: axiosError?.message,
-      status: axiosError?.response?.status,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
+
+    if (error instanceof TMDBApiError) {
+      throw error;
+    }
 
     throw new TMDBApiError(
       `Failed to fetch movie details for ID ${id}`,
-      axiosError?.response?.status,
+      undefined,
       error
     );
   }
@@ -118,21 +114,19 @@ export async function discoverMovie(
       genre,
     } = filter;
 
-    const response = await axios.get<TMDBMoviesResponse>(
-      `${config.tmdb.apiBaseUrl}discover/movie`,
-      {
-        params: {
-          api_key: config.tmdb.apiKey,
-          language,
-          page,
-          sort_by: `${sortBy}.${sortDirection}`,
-          include_adult: includeAdult,
-          year,
-          primary_release_year: primaryReleaseYear,
-          with_genres: genre,
-        },
-      }
-    );
+    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
+    const response = await tmdbClient.get<TMDBMoviesResponse>('/discover/movie', {
+      params: {
+        api_key: config.tmdb.apiKey,
+        language,
+        page,
+        sort_by: `${sortBy}.${sortDirection}`,
+        include_adult: includeAdult,
+        year,
+        primary_release_year: primaryReleaseYear,
+        with_genres: genre,
+      },
+    });
 
     logger.debug('Discovered movies', {
       filter,
@@ -142,18 +136,16 @@ export async function discoverMovie(
 
     return new Movies(response.data);
   } catch (error) {
-    const axiosError = error as any;
     logger.error('Error discovering movies', {
       filter,
       language,
-      error: axiosError?.message,
-      status: axiosError?.response?.status,
+      error: error instanceof Error ? error.message : 'Unknown error',
     });
 
-    throw new TMDBApiError(
-      'Failed to discover movies',
-      axiosError?.response?.status,
-      error
-    );
+    if (error instanceof TMDBApiError) {
+      throw error;
+    }
+
+    throw new TMDBApiError('Failed to discover movies', undefined, error);
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "movie-graphql-server",
   "version": "1.0.0",
-  "description": "TypeScript GraphQL server for TMDB API with Apollo Server 5",
+  "description": "TypeScript GraphQL server for TMDB API with Apollo Server 5, Express 5, and Native Fetch",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -26,11 +26,11 @@
   },
   "dependencies": {
     "@apollo/server": "^5.0.0",
-    "axios": "^1.7.3",
+    "@as-integrations/express5": "^1.1.2",
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.3",
-    "express": "^4.22.1",
+    "express": "^5.2.1",
     "graphql": "^16.9.0"
   },
   "devDependencies": {
