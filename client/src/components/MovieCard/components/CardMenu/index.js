@@ -40,7 +40,9 @@ const CardMenu = ({ children }) => {
         open={open}
         onClick={handleClose}
         onClose={handleClose}
-        MenuListProps={{ "aria-labelledby": "long-button" }}
+        slotProps={{
+          list: { "aria-labelledby": "long-button" }
+        }}
       >
         {children}
       </Menu>
