@@ -14,21 +14,21 @@ export type QueryResolvers = {
     parent: unknown,
     args: { filter?: any },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Movies>;
 
   moviesByIds: (
     parent: unknown,
     args: { ids: number[] },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Movie[]>;
 
   genres: (
     parent: unknown,
     args: Record<string, never>,
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Genre[]>;
 };
 
@@ -38,7 +38,7 @@ export type MovieFieldResolvers = {
     parent: MovieParent,
     args: { format?: string },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => string;
 };
 

@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import { TMDBMovie } from '../../../types/index.js';
-import { config } from '../../../config/index.js';
+import { env } from '../../../config/env.js';
 import { logger } from '../../../utils/index.js';
 import { Genre } from './Genre.js';
 
@@ -39,11 +39,11 @@ export class Movie {
     this.rawReleaseDate = movie.release_date;
 
     this.posterPath = movie.poster_path
-      ? `${config.tmdb.imageBasePath}${movie.poster_path}`
+      ? `${env.TMDB_IMAGE_BASE_PATH}${movie.poster_path}`
       : '';
 
     this.backdropPath = movie.backdrop_path
-      ? `${config.tmdb.imageBasePath}${movie.backdrop_path}`
+      ? `${env.TMDB_IMAGE_BASE_PATH}${movie.backdrop_path}`
       : '';
 
     if (movie.genres && movie.genres.length > 0) {

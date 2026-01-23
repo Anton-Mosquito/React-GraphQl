@@ -1,9 +1,11 @@
 import { Request, Response } from 'express';
+import type { UserJwtPayload } from '../middleware/auth.middleware.js';
 
 export interface GraphQLContext {
   locale: string;
   req: Request;
   res: Response;
+  user?: UserJwtPayload | null;
 }
 
 export interface MoviesFilterArgs {

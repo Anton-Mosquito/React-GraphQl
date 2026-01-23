@@ -1,5 +1,5 @@
-import { logger } from "./logger.js";
-import { TMDBApiError } from "./errors.js";
+import { logger } from './logger.js';
+import { TMDBApiError } from './errors.js';
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -15,7 +15,7 @@ interface FetchResponse<T> {
 function buildSearchParams(
   params?: Record<string, string | number | boolean | undefined>,
 ): string {
-  if (!params) return "";
+  if (!params) return '';
 
   const searchParams = new URLSearchParams();
 
@@ -26,7 +26,7 @@ function buildSearchParams(
   });
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 }
 
 async function fetchWithTimeout(
@@ -53,9 +53,9 @@ export class HttpClient {
   private defaultHeaders: Record<string, string>;
 
   constructor(baseURL: string, defaultHeaders: Record<string, string> = {}) {
-    this.baseURL = baseURL.endsWith("/") ? baseURL.slice(0, -1) : baseURL;
+    this.baseURL = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
     this.defaultHeaders = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...defaultHeaders,
     };
   }
@@ -67,13 +67,13 @@ export class HttpClient {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
-    logger.debug("HTTP GET request", { url, params });
+    logger.debug('HTTP GET request', { url, params });
 
     try {
       const response = await fetchWithTimeout(
         url,
         {
-          method: "GET",
+          method: 'GET',
           headers: {
             ...this.defaultHeaders,
             ...headers,
@@ -85,7 +85,7 @@ export class HttpClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error("HTTP request failed", {
+        logger.error('HTTP request failed', {
           url,
           status: response.status,
           statusText: response.statusText,
@@ -110,18 +110,18 @@ export class HttpClient {
         throw error;
       }
 
-      if (error instanceof Error && error.name === "AbortError") {
-        logger.error("HTTP request timeout", { url, timeout });
-        throw new TMDBApiError("Request timeout", 408, error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        logger.error('HTTP request timeout', { url, timeout });
+        throw new TMDBApiError('Request timeout', 408, error);
       }
 
       if (error instanceof TypeError) {
-        logger.error("Network error", { url, error: error.message });
-        throw new TMDBApiError("Network error", undefined, error);
+        logger.error('Network error', { url, error: error.message });
+        throw new TMDBApiError('Network error', undefined, error);
       }
 
-      logger.error("Unexpected HTTP error", { url, error });
-      throw new TMDBApiError("Unexpected error occurred", undefined, error);
+      logger.error('Unexpected HTTP error', { url, error });
+      throw new TMDBApiError('Unexpected error occurred', undefined, error);
     }
   }
 
@@ -133,13 +133,13 @@ export class HttpClient {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
-    logger.debug("HTTP POST request", { url, data });
+    logger.debug('HTTP POST request', { url, data });
 
     try {
       const response = await fetchWithTimeout(
         url,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
             ...this.defaultHeaders,
             ...headers,
@@ -152,7 +152,7 @@ export class HttpClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error("HTTP POST request failed", {
+        logger.error('HTTP POST request failed', {
           url,
           status: response.status,
           statusText: response.statusText,
@@ -177,14 +177,14 @@ export class HttpClient {
         throw error;
       }
 
-      logger.error("POST request error", { url, error });
-      throw new TMDBApiError("Request failed", undefined, error);
+      logger.error('POST request error', { url, error });
+      throw new TMDBApiError('Request failed', undefined, error);
     }
   }
 }
 
 export function createTMDBClient(baseURL: string): HttpClient {
   return new HttpClient(baseURL, {
-    Accept: "application/json",
+    Accept: 'application/json',
   });
 }

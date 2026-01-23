@@ -1,4 +1,4 @@
-type LogLevel = "info" | "warn" | "error" | "debug";
+type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 class Logger {
   private log(level: LogLevel, message: string, meta?: unknown): void {
@@ -13,20 +13,20 @@ class Logger {
   }
 
   info(message: string, meta?: unknown): void {
-    this.log("info", message, meta);
+    this.log('info', message, meta);
   }
 
   warn(message: string, meta?: unknown): void {
-    this.log("warn", message, meta);
+    this.log('warn', message, meta);
   }
 
   error(message: string, meta?: unknown): void {
-    this.log("error", message, meta);
+    this.log('error', message, meta);
   }
 
   debug(message: string, meta?: unknown): void {
-    if (process.env.NODE_ENV === "development") {
-      this.log("debug", message, meta);
+    if (process.env.NODE_ENV === 'development') {
+      this.log('debug', message, meta);
     }
   }
 }

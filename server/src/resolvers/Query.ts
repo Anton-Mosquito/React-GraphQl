@@ -1,7 +1,4 @@
-import {
-  getDetails,
-  discoverMovie,
-} from '../modules/movies/index.js';
+import { getDetails, discoverMovie } from '../modules/movies/index.js';
 import { getList } from '../modules/genres/index.js';
 import { QueryResolvers } from '../types/index.js';
 import { logger } from '../utils/index.js';
@@ -13,7 +10,10 @@ const queryResolvers: QueryResolvers = {
       // Validate input
       validateMovieFilter(args.filter);
 
-      logger.debug('Query: movies', { filter: args.filter, locale: context.locale });
+      logger.debug('Query: movies', {
+        filter: args.filter,
+        locale: context.locale,
+      });
       const data = await discoverMovie(args.filter, context.locale);
       return data;
     } catch (error) {

@@ -30,3 +30,98 @@ dist/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+
+
+### Node ###
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Bower dependency directory (https://bower.io/)
+bower_components
+
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Snowpack dependency directory (https://snowpack.dev/)
+web_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+
+
+### Node / TypeScript - common artifacts
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Dependency directories
+node_modules/
+
+# Build / output
+dist/
+build/
+out/
+coverage/
+.nyc_output/
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Caches & temporary folders
+.cache/
+.parcel-cache/
+.temp/
+
+# Runtime Prisma caches (do not ignore committed generated client under src/generated)
+node_modules/.prisma/
+.prisma/
+
+# dotenv environment variable files
+.env
+.env.*.local
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Misc
+.eslintcache
+.stylelintcache
+
+# Ignore local SQLite DB files if present
+*.db

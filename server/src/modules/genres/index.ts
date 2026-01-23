@@ -1,5 +1,5 @@
 import { Genre } from '../movies/entities/index.js';
-import { config } from '../../config/index.js';
+import { env } from '../../config/env.js';
 import { logger } from '../../utils/index.js';
 import { TMDBApiError } from '../../utils/index.js';
 import { createTMDBClient } from '../../utils/index.js';
@@ -12,13 +12,16 @@ import { TMDBGenresResponse } from '../../types/index.js';
  */
 export async function getList(language: string = 'en-US'): Promise<Genre[]> {
   try {
-    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
-    const response = await tmdbClient.get<TMDBGenresResponse>('/genre/movie/list', {
-      params: {
-        api_key: config.tmdb.apiKey,
-        language,
+    const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
+    const response = await tmdbClient.get<TMDBGenresResponse>(
+      '/genre/movie/list',
+      {
+        params: {
+          api_key: env.TMDB_API_KEY,
+          language,
+        },
       },
-    });
+    );
 
     logger.debug('Fetched genres list', {
       language,

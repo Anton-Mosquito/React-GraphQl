@@ -15,7 +15,8 @@ export class ValidationError extends GraphQLError {
 export function validateMovieFilter(filter?: MovieFilterInput): void {
   if (!filter) return;
 
-  const { page, year, primaryReleaseYear, sortBy, sortDirection } = filter as any;
+  const { page, year, primaryReleaseYear, sortBy, sortDirection } =
+    filter as any;
 
   // Validate page
   if (page !== undefined) {
@@ -33,7 +34,7 @@ export function validateMovieFilter(filter?: MovieFilterInput): void {
     if (!Number.isInteger(year) || year < 1900 || year > currentYear + 5) {
       throw new ValidationError(
         `Year must be between 1900 and ${currentYear + 5}`,
-        'year'
+        'year',
       );
     }
   }
@@ -48,7 +49,7 @@ export function validateMovieFilter(filter?: MovieFilterInput): void {
     ) {
       throw new ValidationError(
         `Primary release year must be between 1900 and ${currentYear + 5}`,
-        'primaryReleaseYear'
+        'primaryReleaseYear',
       );
     }
   }
@@ -66,7 +67,7 @@ export function validateMovieFilter(filter?: MovieFilterInput): void {
   if (sortBy && !validSortBy.includes(sortBy)) {
     throw new ValidationError(
       `sortBy must be one of: ${validSortBy.join(', ')}`,
-      'sortBy'
+      'sortBy',
     );
   }
 
@@ -74,7 +75,7 @@ export function validateMovieFilter(filter?: MovieFilterInput): void {
   if (sortDirection && !['asc', 'desc'].includes(sortDirection)) {
     throw new ValidationError(
       'sortDirection must be either "asc" or "desc"',
-      'sortDirection'
+      'sortDirection',
     );
   }
 }
@@ -89,14 +90,17 @@ export function validateMovieIds(ids: number[]): void {
   }
 
   if (ids.length > 50) {
-    throw new ValidationError('Cannot request more than 50 movies at once', 'ids');
+    throw new ValidationError(
+      'Cannot request more than 50 movies at once',
+      'ids',
+    );
   }
 
   for (const id of ids) {
     if (!Number.isInteger(id) || id < 1) {
       throw new ValidationError(
         `All movie IDs must be positive integers, got: ${id}`,
-        'ids'
+        'ids',
       );
     }
   }

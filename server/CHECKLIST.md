@@ -1,8 +1,9 @@
 # Future Improvements Checklist
 
 ## High Priority
-- [ ] Add ESLint with TypeScript rules
-- [ ] Add Prettier for code formatting
+
+- [x] Add ESLint with TypeScript rules
+- [x] Add Prettier for code formatting
 - [ ] Implement unit tests (Jest + ts-jest)
 - [ ] Add integration tests for GraphQL queries
 - [ ] Implement caching layer (Redis or in-memory)
@@ -10,6 +11,7 @@
 - [ ] Implement DataLoader for batching TMDB requests
 
 ## Medium Priority
+
 - [ ] Add Sentry or similar error tracking
 - [ ] Implement request tracing (OpenTelemetry)
 - [ ] Add GraphQL complexity analysis
@@ -19,6 +21,7 @@
 - [ ] Add CI/CD pipeline (GitHub Actions)
 
 ## Low Priority
+
 - [ ] Add GraphQL subscriptions (if needed)
 - [ ] Implement custom directives
 - [ ] Add GraphQL Code Generator for client types
@@ -27,6 +30,7 @@
 - [ ] Implement feature flags
 
 ## Documentation
+
 - [ ] Add JSDoc comments to all public APIs
 - [ ] Create architecture diagrams
 - [ ] Document deployment process
@@ -34,6 +38,7 @@
 - [ ] Create API versioning strategy
 
 ## Security
+
 - [ ] Add helmet.js for additional security headers
 - [ ] Implement API key authentication (if needed)
 - [ ] Add request signing validation

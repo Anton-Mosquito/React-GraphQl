@@ -1,6 +1,6 @@
 import { Movies } from './entities/index.js';
 import { Movie } from './entities/index.js';
-import { config } from '../../config/index.js';
+import { env } from '../../config/env.js';
 import { logger } from '../../utils/index.js';
 import { TMDBApiError } from '../../utils/index.js';
 import { createTMDBClient } from '../../utils/index.js';
@@ -18,17 +18,20 @@ import {
  */
 export async function getPopular(
   page: number = 1,
-  language: string = 'en-US'
+  language: string = 'en-US',
 ): Promise<Movies> {
   try {
-    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
-    const response = await tmdbClient.get<TMDBMoviesResponse>('/movie/popular', {
-      params: {
-        api_key: config.tmdb.apiKey,
-        language,
-        page,
+    const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
+    const response = await tmdbClient.get<TMDBMoviesResponse>(
+      '/movie/popular',
+      {
+        params: {
+          api_key: env.TMDB_API_KEY,
+          language,
+          page,
+        },
       },
-    });
+    );
 
     logger.debug('Fetched popular movies', {
       page,
@@ -60,13 +63,13 @@ export async function getPopular(
  */
 export async function getDetails(
   id: number,
-  language: string = 'en-US'
+  language: string = 'en-US',
 ): Promise<Movie> {
   try {
-    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
+    const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
     const response = await tmdbClient.get<TMDBMovie>(`/movie/${id}`, {
       params: {
-        api_key: config.tmdb.apiKey,
+        api_key: env.TMDB_API_KEY,
         language,
       },
     });
@@ -88,7 +91,7 @@ export async function getDetails(
     throw new TMDBApiError(
       `Failed to fetch movie details for ID ${id}`,
       undefined,
-      error
+      error,
     );
   }
 }
@@ -101,7 +104,7 @@ export async function getDetails(
  */
 export async function discoverMovie(
   filter: MovieFilterInput = {},
-  language: string = 'en-US'
+  language: string = 'en-US',
 ): Promise<Movies> {
   try {
     const {
@@ -114,19 +117,22 @@ export async function discoverMovie(
       genre,
     } = filter;
 
-    const tmdbClient = createTMDBClient(config.tmdb.apiBaseUrl);
-    const response = await tmdbClient.get<TMDBMoviesResponse>('/discover/movie', {
-      params: {
-        api_key: config.tmdb.apiKey,
-        language,
-        page,
-        sort_by: `${sortBy}.${sortDirection}`,
-        include_adult: includeAdult,
-        year,
-        primary_release_year: primaryReleaseYear,
-        with_genres: genre,
+    const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
+    const response = await tmdbClient.get<TMDBMoviesResponse>(
+      '/discover/movie',
+      {
+        params: {
+          api_key: env.TMDB_API_KEY,
+          language,
+          page,
+          sort_by: `${sortBy}.${sortDirection}`,
+          include_adult: includeAdult,
+          year,
+          primary_release_year: primaryReleaseYear,
+          with_genres: genre,
+        },
       },
-    });
+    );
 
     logger.debug('Discovered movies', {
       filter,

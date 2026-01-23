@@ -13,8 +13,8 @@ TypeScript-based GraphQL server for The Movie Database (TMDB) API with Apollo Se
 - **Structured logging** with context
 - **Error handling** with custom error types
 - **Health check** endpoint for monitoring
- - **Native Fetch API** (no external HTTP dependencies)
- - **Zero external HTTP dependencies** (uses Node.js built-in fetch)
+- **Native Fetch API** (no external HTTP dependencies)
+- **Zero external HTTP dependencies** (uses Node.js built-in fetch)
 
 ## 📋 Prerequisites
 
@@ -25,6 +25,7 @@ TypeScript-based GraphQL server for The Movie Database (TMDB) API with Apollo Se
 Note: Node.js 18+ is required for native Fetch API support.
 
 ## 🔧 Installation
+
 ```bash
 # Install dependencies
 npm install
@@ -39,11 +40,13 @@ cp .env.example .env
 ## 🏃 Running the Server
 
 ### Development mode (with hot reload)
+
 ```bash
 npm run dev
 ```
 
 ### Production mode
+
 ```bash
 # Build TypeScript to JavaScript
 npm run build
@@ -53,6 +56,7 @@ npm start
 ```
 
 ### Type checking only
+
 ```bash
 npm run type-check
 ```
@@ -68,16 +72,20 @@ npm run type-check
 ### Queries
 
 #### `movies`
+
 Get movies with filtering and pagination
+
 ```graphql
 query {
-  movies(filter: {
-    page: 1
-    sortBy: "popularity"
-    sortDirection: desc
-    year: 2024
-    genre: 28  # Action
-  }) {
+  movies(
+    filter: {
+      page: 1
+      sortBy: "popularity"
+      sortDirection: desc
+      year: 2024
+      genre: 28 # Action
+    }
+  ) {
     page
     totalResults
     totalPages
@@ -93,6 +101,7 @@ query {
 ```
 
 **Filter options:**
+
 - `page` (Int): Page number (1-500)
 - `sortBy` (String): Sort field (popularity, release_date, vote_average, etc.)
 - `sortDirection` (SORT_DIRECTION): asc or desc
@@ -102,7 +111,9 @@ query {
 - `includeAdult` (Boolean): Include adult content
 
 #### `moviesByIds`
+
 Get multiple movies by their IDs
+
 ```graphql
 query {
   moviesByIds(ids: [550, 551, 552]) {
@@ -118,11 +129,14 @@ query {
 ```
 
 **Validation:**
+
 - Maximum 50 IDs per request
 - All IDs must be positive integers
 
 #### `genres`
+
 Get list of all movie genres
+
 ```graphql
 query {
   genres {
@@ -135,6 +149,7 @@ query {
 ### Types
 
 #### Movie
+
 ```graphql
 type Movie {
   id: ID!
@@ -155,6 +170,7 @@ type Movie {
 ```
 
 #### Movies (Paginated Response)
+
 ```graphql
 type Movies {
   page: Int!
@@ -165,6 +181,7 @@ type Movies {
 ```
 
 #### Genre
+
 ```graphql
 type Genre {
   id: Int!
@@ -173,6 +190,7 @@ type Genre {
 ```
 
 ## 🔐 Environment Variables
+
 ```env
 NODE_ENV=development|production
 PORT=4000
@@ -185,28 +203,30 @@ ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
 ## 🏗️ Project Structure
+
 server/
 ├── src/
-│   ├── config/          # Configuration and env variables
-│   ├── middleware/      # Express middleware
-│   ├── modules/         # Business logic modules
-│   │   ├── movies/      # Movie-related logic
-│   │   │   └── entities/  # Domain models
-│   │   └── genres/      # Genre-related logic
-│   ├── resolvers/       # GraphQL resolvers
-│   ├── types/           # TypeScript type definitions
-│   ├── utils/           # Utilities (logger, errors, validation)
-│   ├── schema.graphql   # GraphQL schema definition
-│   └── index.ts         # Application entry point
-├── dist/                # Compiled JavaScript (generated)
-├── .env                 # Environment variables (not in git)
-├── .env.example         # Environment template
-├── tsconfig.json        # TypeScript configuration
-└── package.json         # Dependencies and scripts
+│ ├── config/ # Configuration and env variables
+│ ├── middleware/ # Express middleware
+│ ├── modules/ # Business logic modules
+│ │ ├── movies/ # Movie-related logic
+│ │ │ └── entities/ # Domain models
+│ │ └── genres/ # Genre-related logic
+│ ├── resolvers/ # GraphQL resolvers
+│ ├── types/ # TypeScript type definitions
+│ ├── utils/ # Utilities (logger, errors, validation)
+│ ├── schema.graphql # GraphQL schema definition
+│ └── index.ts # Application entry point
+├── dist/ # Compiled JavaScript (generated)
+├── .env # Environment variables (not in git)
+├── .env.example # Environment template
+├── tsconfig.json # TypeScript configuration
+└── package.json # Dependencies and scripts
 
 ## 🧪 Testing Examples
 
 ### Valid request
+
 ```bash
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
@@ -215,6 +235,7 @@ curl -X POST http://localhost:4000/graphql \
 ```
 
 ### Invalid request (triggers validation)
+
 ```bash
 curl -X POST http://localhost:4000/graphql \
   -H "Content-Type: application/json" \
@@ -222,15 +243,18 @@ curl -X POST http://localhost:4000/graphql \
 ```
 
 Expected error:
+
 ```json
 {
-  "errors": [{
-    "message": "Page must be a positive integer",
-    "extensions": {
-      "code": "BAD_USER_INPUT",
-      "field": "page"
+  "errors": [
+    {
+      "message": "Page must be a positive integer",
+      "extensions": {
+        "code": "BAD_USER_INPUT",
+        "field": "page"
+      }
     }
-  }]
+  ]
 }
 ```
 
@@ -246,11 +270,13 @@ Expected error:
 ## 📊 Monitoring
 
 ### Health Check
+
 ```bash
 curl http://localhost:4000/health
 ```
 
 Response:
+
 ```json
 {
   "status": "ok",
@@ -265,6 +291,7 @@ Response:
 ### Docker (recommended)
 
 Create `Dockerfile`:
+
 ```dockerfile
 FROM node:18-alpine
 
@@ -282,6 +309,7 @@ CMD ["npm", "start"]
 ```
 
 Build and run:
+
 ```bash
 docker build -t movie-graphql-server .
 docker run -p 4000:4000 --env-file .env movie-graphql-server
@@ -290,6 +318,7 @@ docker run -p 4000:4000 --env-file .env movie-graphql-server
 ### Manual Deployment
 
 1. Build the application:
+
 ```bash
    npm run build
 ```
@@ -297,6 +326,7 @@ docker run -p 4000:4000 --env-file .env movie-graphql-server
 2. Set production environment variables
 
 3. Start the server:
+
 ```bash
    NODE_ENV=production npm start
 ```
@@ -304,16 +334,19 @@ docker run -p 4000:4000 --env-file .env movie-graphql-server
 ## 🐛 Troubleshooting
 
 ### Server won't start
+
 - Check `.env` file exists and has valid `TMDB_API_KEY`
 - Ensure port 4000 is not in use
 - Run `npm run type-check` for TypeScript errors
 
 ### GraphQL errors
+
 - Check browser console for detailed error messages
 - Verify request payload format
 - Check logs for validation errors
 
 ### TMDB API errors
+
 - Verify API key is valid
 - Check TMDB API status (https://status.themoviedb.org/)
 - Review rate limits (TMDB has 40 requests per 10 seconds limit)

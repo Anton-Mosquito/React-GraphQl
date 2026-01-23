@@ -1,0 +1,56 @@
+server {
+    listen 80;
+
+    # Проксі для API
+    location /api {
+        proxy_pass http://server:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Проксі для GraphQL
+    location /graphql {
+        proxy_pass http://server:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    # WebSocket для сервера (якщо використовуєш корінь / для WS)
+    # Якщо твій сервер слухає WS на тому ж порті, що і HTTP, але за окремим шляхом, додай це сюди.
+    # Якщо WS на корені, то блок location / нижче може перехоплювати його. 
+    # В Express-ws зазвичай WS йдуть на ті ж шляхи. 
+
+    # Проксі для React Dev Server (Client)
+    location / {
+        proxy_pass http://client:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    # Спеціальний блок для Hot Module Replacement (HMR) веб-сокетів React/Vite
+    # Для Create React App (Webpack):
+    location /sockjs-node {
+        proxy_pass http://client:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+    
+    # Для Vite (зазвичай /ws або @vite):
+    location /ws {
+        proxy_pass http://client:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
