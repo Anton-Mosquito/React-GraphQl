@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
-    "lib": ["ES2022", "DOM"],
-    "jsx": "react-jsx",
     "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "strict": false,
+    "allowJs": true,
+    "checkJs": false,
     "esModuleInterop": true,
-    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
+    "skipLibCheck": true,
     "noEmit": true,
     "resolveJsonModule": true,
-    "types": ["node", "react", "react-dom"]
+    "isolatedModules": true,
+    "incremental": true,
+    "types": ["node", "jest", "react", "react-dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "vite.config.ts", "env.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

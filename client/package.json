@@ -2,7 +2,18 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "check:types": "tsc --noEmit"
+  },
   "dependencies": {
+    "@apollo/client": "^4.1.2",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@fontsource/roboto": "^5.2.9",
@@ -12,7 +23,6 @@
     "final-form": "^5.0.0",
     "flat": "^6.0.1",
     "graphql": "^16.12.0",
-    "@apollo/client": "^4.1.2",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-final-form": "^7.0.0",
@@ -22,43 +32,29 @@
     "react-share": "^5.2.2",
     "web-vitals": "^5.1.0"
   },
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "test": "echo \"No tests configured. Run your test runner manually.\" && exit 0",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "format": "prettier --write .",
-    "check:types": "tsc --noEmit"
-  },
-  
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
-    "vite": "^7.3.1",
-    "@vitejs/plugin-react": "^5.1.2",
-    "typescript": "^5.9.3",
+    "@eslint/css": "^0.14.1",
+    "@eslint/js": "^9.39.2",
+    "@eslint/json": "^0.14.0",
+    "@types/eslint-plugin-jsx-a11y": "^6.10.1",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.10",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
-    "eslint": "^9.39.2",
-    "prettier": "^3.8.1",
-    "@typescript-eslint/parser": "^8.53.1",
     "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "@vitejs/plugin-react": "^5.1.2",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.32.0"
+    "eslint-plugin-unused-imports": "^4.3.0",
+    "globals": "^17.1.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.53.1",
+    "vite": "^7.3.1"
   }
 }

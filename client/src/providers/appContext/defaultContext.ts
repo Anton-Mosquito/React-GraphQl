@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+
 import { LOCALES } from '../../const';
 import { STORAGE_KEY } from '../../const';
 import { getFromStorage } from '../../utils/localStorage';

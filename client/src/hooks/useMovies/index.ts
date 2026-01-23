@@ -19,14 +19,14 @@ export const useMovies = () => {
         setSelectedMovies([movie, ...selectedMovies]);
       }
     },
-    [selectedMovies]
+    [selectedMovies],
   );
 
   const deleteMovie = useCallback(
     (movie: Movie) => {
       setSelectedMovies(selectedMovies.filter(({ id }) => id !== movie.id));
     },
-    [selectedMovies]
+    [selectedMovies],
   );
 
   return {

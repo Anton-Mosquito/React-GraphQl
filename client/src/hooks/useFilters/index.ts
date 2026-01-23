@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+
 import { SORT_DIRECTION } from '../../const';
 
 export type Filters = {
@@ -25,11 +26,15 @@ export const useFilters = () => {
         page,
       });
     },
-    [filter]
+    [filter],
   );
 
   const setFilter = useCallback(
-    (filterFields: Partial<Filters & { year?: string | number; primaryReleaseYear?: string | number }>) => {
+    (
+      filterFields: Partial<
+        Filters & { year?: string | number; primaryReleaseYear?: string | number }
+      >,
+    ) => {
       setFilterFields({
         ...filter,
         ...filterFields,
@@ -40,7 +45,7 @@ export const useFilters = () => {
             : filter.primaryReleaseYear,
       });
     },
-    [filter]
+    [filter],
   );
 
   return {

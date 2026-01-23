@@ -1,0 +1,32 @@
+# Node / build artifacts
+node_modules
+dist
+build
+storybook-static
+coverage
+
+# Package managers
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Configs (не форматувати автогенерацію)
+vite.config.ts
+tsconfig.json
+.eslintrc.cjs
+.prettierrc
+.prettierignore
+.eslintignore
+
+# IDE / OS
+.DS_Store
+.idea
+.vscode
+
+# Logs
+*.log

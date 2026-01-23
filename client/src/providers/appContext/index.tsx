@@ -1,5 +1,7 @@
 import React, { createContext, useReducer } from 'react';
-import { useDefaultContext, AppState } from './defaultContext';
+
+import type { AppState } from './defaultContext';
+import { useDefaultContext } from './defaultContext';
 import { STORAGE_KEY } from '../../const';
 import { saveToStorage } from '../../utils/localStorage';
 

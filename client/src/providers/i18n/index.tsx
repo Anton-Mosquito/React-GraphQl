@@ -1,6 +1,7 @@
-import React, { Fragment, ReactNode } from 'react';
-import { IntlProvider } from 'react-intl';
 import { flatten } from 'flat';
+import type { ReactNode } from 'react';
+import React, { Fragment } from 'react';
+import { IntlProvider } from 'react-intl';
 
 import { LOCALES } from '../../const';
 import messages from '../../messages';

@@ -1,0 +1,16 @@
+# Browserslist configuration
+# Документація: https://browsersl.ist/
+
+# Production targets
+[production]
+>0.2%
+last 2 versions
+not dead
+not op_mini all
+not ie <= 11
+
+# Development targets
+[development]
+last 1 chrome version
+last 1 firefox version
+last 1 safari version

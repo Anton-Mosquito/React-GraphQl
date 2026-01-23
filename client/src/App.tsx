@@ -2,26 +2,21 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import CssBaseline from '@mui/material/CssBaseline';
-import Container from '@mui/material/Container';
+import { ApolloClient, InMemoryCache, HttpLink, ApolloLink, from } from '@apollo/client';
+import { ApolloProvider } from '@apollo/client/react';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+import React, { useContext } from 'react';
 import { Route, Routes } from 'react-router-dom';
+
 import { Navigation } from './components';
 import { Home, Settings, Recommend } from './pages';
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  HttpLink,
-  ApolloLink,
-  from,
-} from '@apollo/client';
-import { useContext } from 'react';
 import { AppContext } from './providers/appContext';
 import I18nProvider from './providers/i18n';
 
-function App(): JSX.Element {
-  const { state } = useContext(AppContext as any);
+function App(): React.ReactElement {
+  const { state } = useContext(AppContext) as any;
   const httpLink = new HttpLink({ uri: `http://localhost:4000/graphql` });
   const localeMiddleware = new ApolloLink((operation, forward) => {
     const customHeaders = operation.getContext().hasOwnProperty('headers')
@@ -39,7 +34,6 @@ function App(): JSX.Element {
   const client = new ApolloClient({
     link: from([localeMiddleware, httpLink]),
     cache: new InMemoryCache(),
-    connectToDevTools: true,
   });
 
   return (
