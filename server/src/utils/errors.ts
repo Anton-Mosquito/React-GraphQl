@@ -30,7 +30,6 @@ export class ApiError extends AppError {
   public errors?: unknown;
 
   constructor(message: string, statusCode = 400, errors?: unknown) {
-    // For client errors default to 'fail'
     super(message, statusCode, statusCode >= 500 ? 'error' : 'fail');
     this.errors = errors;
     Object.setPrototypeOf(this, ApiError.prototype);
@@ -61,7 +60,6 @@ export class TMDBApiError extends AppError {
   public originalError?: unknown;
 
   constructor(message: string, statusCode = 502, originalError?: unknown) {
-    // treat TMDB upstream errors as server errors by default
     super(message, statusCode, 'error');
     this.originalError = originalError;
     Object.setPrototypeOf(this, TMDBApiError.prototype);

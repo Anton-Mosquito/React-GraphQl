@@ -1,4 +1,4 @@
-import { MovieFieldResolvers } from '../types/index.js';
+import { MovieFieldResolvers } from '#types/index.js';
 
 const movieResolvers: MovieFieldResolvers = {
   releaseDate(parent, args) {

@@ -1,19 +1,17 @@
 import WebSocket, { Server as WSServer, type RawData } from 'ws';
-import { logger } from '../../utils/index.js';
+import { logger } from '#utils/index.js';
 import {
-  ExtendedWebSocket,
-  WsMessageSchema,
+  wsMessageSchema,
   WsMessage,
   ConnectionMessage,
   DrawMessage,
+} from '#schema/index.js';
+import {
   WsEventType,
+  ExtendedWebSocket,
   BroadcastEvent,
-} from './websocket.types.js';
+} from '#types/index.js';
 
-/**
- * WebSocket Controller for collaborative drawing feature
- * Handles real-time communication between clients
- */
 export default class WebSocketController {
   private wss: WSServer;
   private readonly MAX_MESSAGE_SIZE = 1024 * 100; // 100KB max message size
@@ -29,7 +27,6 @@ export default class WebSocketController {
    * Sets up event listeners for the connection lifecycle
    */
   handleConnection(ws: ExtendedWebSocket): void {
-    // Set connection metadata
     ws.connectedAt = new Date();
     ws.isInitialized = false;
 
@@ -37,7 +34,6 @@ export default class WebSocketController {
       timestamp: ws.connectedAt.toISOString(),
     });
 
-    // Set timeout for initialization
     const initTimeout = setTimeout(() => {
       if (!ws.isInitialized) {
         logger.warn(
@@ -47,10 +43,8 @@ export default class WebSocketController {
       }
     }, this.CONNECTION_TIMEOUT);
 
-    // Message handler
     ws.on('message', (rawMessage: RawData) => {
       try {
-        // Clear initialization timeout on first message
         if (!ws.isInitialized) {
           clearTimeout(initTimeout);
         }
@@ -61,13 +55,11 @@ export default class WebSocketController {
       }
     });
 
-    // Close handler
     ws.on('close', (code: number, reason: Buffer) => {
       clearTimeout(initTimeout);
       this.handleClose(ws, code, reason.toString());
     });
 
-    // Error handler
     ws.on('error', (error: Error) => {
       logger.error('WebSocket error', {
         username: ws.username,
@@ -76,7 +68,6 @@ export default class WebSocketController {
       });
     });
 
-    // Ping/Pong for connection health
     ws.on('pong', () => {
       logger.debug('Pong received', { username: ws.username });
     });
@@ -86,10 +77,8 @@ export default class WebSocketController {
    * Handle incoming WebSocket message
    */
   private handleMessage(ws: ExtendedWebSocket, rawMessage: RawData): void {
-    // Convert to string
     const messageText = this.rawDataToString(rawMessage);
 
-    // Check message size
     if (messageText.length > this.MAX_MESSAGE_SIZE) {
       logger.warn('Message too large', {
         size: messageText.length,
@@ -100,7 +89,6 @@ export default class WebSocketController {
       return;
     }
 
-    // Parse JSON
     let parsed: unknown;
     try {
       parsed = JSON.parse(messageText);
@@ -113,8 +101,7 @@ export default class WebSocketController {
       return;
     }
 
-    // Validate with Zod schema
-    const validationResult = WsMessageSchema.safeParse(parsed);
+    const validationResult = wsMessageSchema.safeParse(parsed);
 
     if (!validationResult.success) {
       logger.warn('Message validation failed', {
@@ -128,7 +115,6 @@ export default class WebSocketController {
 
     const message = validationResult.data as WsMessage;
 
-    // Route message to appropriate handler
     if (message.method === 'connection') {
       this.handleConnectionMessage(ws, message as ConnectionMessage);
     } else if (message.method === 'draw') {
@@ -153,7 +139,6 @@ export default class WebSocketController {
       connectedAt: ws.connectedAt?.toISOString(),
     });
 
-    // Broadcast to other users
     const event: BroadcastEvent = {
       type: WsEventType.USER_CONNECTED,
       timestamp: new Date().toISOString(),
@@ -182,7 +167,6 @@ export default class WebSocketController {
       figureType: message.figure.type,
     });
 
-    // Broadcast draw event to other users
     const event: BroadcastEvent = {
       type: WsEventType.DRAW,
       timestamp: new Date().toISOString(),
@@ -272,7 +256,6 @@ export default class WebSocketController {
     let failCount = 0;
 
     this.wss.clients.forEach((client) => {
-      // Skip sender and non-open connections
       if (client === sender || client.readyState !== WebSocket.OPEN) {
         return;
       }
@@ -312,12 +295,11 @@ export default class WebSocketController {
       return Buffer.concat(data).toString('utf8');
     }
 
-    // ArrayBuffer
     return Buffer.from(data).toString('utf8');
   }
 
   /**
-   * Get connection statistics (useful for monitoring)
+   * Get connection statistics
    */
   getStats(): {
     totalConnections: number;

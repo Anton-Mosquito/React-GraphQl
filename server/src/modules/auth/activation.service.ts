@@ -1,20 +1,16 @@
-import { z } from 'zod';
 import prisma from '../../lib/db.js';
-import { ApiError } from '../../utils/errors.js';
-import { logger } from '../../utils/logger.js';
-
-const ActivationLinkSchema = z.string().uuid('Invalid activation link format');
+import { logger, ApiError } from '#utils/index.js';
+import { activationLinkSchema } from '#schema/index.js';
 
 class ActivationService {
   /**
    * Activate user account by activation link
    */
   async activate(input: unknown): Promise<void> {
-    const activationLink = ActivationLinkSchema.parse(input);
+    const activationLink = activationLinkSchema.parse(input);
 
     logger.debug('ActivationService.activate', { activationLink });
 
-    // Find user by activation link
     const user = await prisma.user.findFirst({
       where: { activationLink },
     });
@@ -23,13 +19,11 @@ class ActivationService {
       throw ApiError.BadRequest('Invalid activation link');
     }
 
-    // Check if already activated
     if (user.isActivated) {
       logger.debug('User already activated', { userId: user.id });
       return;
     }
 
-    // Activate user and remove activation link
     await prisma.user.update({
       where: { id: user.id },
       data: {

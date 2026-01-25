@@ -6,7 +6,16 @@
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src",
-    
+    "baseUrl": "./src",
+    "paths": {
+      "#config/*": ["./config/*"],
+      "#modules/*": ["./modules/*"],
+      "#types/*": ["./types/*"],
+      "#utils/*": ["./utils/*"],
+      "#middleware/*": ["./middleware/*"],
+      "#schema/*": ["./schema/*"]
+    },
+
     // Strict Type-Checking Options
     "strict": true,
     "noImplicitAny": true,
@@ -16,7 +25,7 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
-    
+
     // Additional Checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -25,13 +34,13 @@
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
-    
+
     // Module Resolution
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    
+
     // Emit
     "declaration": true,
     "declarationMap": true,

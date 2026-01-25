@@ -1,31 +1,12 @@
+import { env } from '#config/env.js';
+import { ApiError, logger } from '#utils/index.js';
+import {
+  gmailOAuthConfigSchema,
+  smtpConfigSchema,
+  type GmailOAuthConfig,
+  type SmtpConfig,
+} from '#schema/index.js';
 import nodemailer, { Transporter } from 'nodemailer';
-import { z } from 'zod';
-import { ApiError } from '../../utils/errors.js';
-import { logger } from '../../utils/logger.js';
-
-/**
- * Zod schema for Gmail OAuth2 configuration
- */
-const GmailOAuthConfigSchema = z.object({
-  user: z.string().email('Invalid Gmail address'),
-  clientId: z.string().min(1, 'OAuth Client ID is required'),
-  clientSecret: z.string().min(1, 'OAuth Client Secret is required'),
-  refreshToken: z.string().min(1, 'OAuth Refresh Token is required'),
-});
-
-/**
- * Zod schema for generic SMTP configuration
- */
-const SmtpConfigSchema = z.object({
-  host: z.string().min(1, 'SMTP host is required'),
-  port: z.coerce.number().int().positive().default(587),
-  secure: z.boolean().default(false),
-  user: z.string().optional(),
-  pass: z.string().optional(),
-});
-
-type GmailOAuthConfig = z.infer<typeof GmailOAuthConfigSchema>;
-type SmtpConfig = z.infer<typeof SmtpConfigSchema>;
 
 class MailService {
   private transporter: Transporter | null = null;
@@ -38,7 +19,6 @@ class MailService {
    * Tries Gmail OAuth2 first, falls back to generic SMTP
    */
   private initializeTransporter(): void {
-    // If already attempted initialization, don't try again
     if (this.initializationAttempted) {
       if (this.initializationError) {
         throw this.initializationError;
@@ -49,7 +29,6 @@ class MailService {
     this.initializationAttempted = true;
 
     try {
-      // Try Gmail OAuth2 configuration first
       const gmailConfig = this.tryGmailOAuthConfig();
       if (gmailConfig) {
         this.transporter = this.createGmailTransporter(gmailConfig);
@@ -57,7 +36,6 @@ class MailService {
         return;
       }
 
-      // Fallback to generic SMTP
       const smtpConfig = this.trySmtpConfig();
       if (smtpConfig) {
         this.transporter = this.createSmtpTransporter(smtpConfig);
@@ -68,7 +46,6 @@ class MailService {
         return;
       }
 
-      // No valid configuration found
       const error = new Error(
         'Mail service is not configured. Please set either Gmail OAuth2 or SMTP credentials in environment variables.',
       );
@@ -87,11 +64,11 @@ class MailService {
    * Try to parse Gmail OAuth2 configuration from environment
    */
   private tryGmailOAuthConfig(): GmailOAuthConfig | null {
-    const result = GmailOAuthConfigSchema.safeParse({
-      user: process.env['MAIL_USER'],
-      clientId: process.env['OAUTH_CLIENT_ID'],
-      clientSecret: process.env['OAUTH_CLIENT_SECRET'],
-      refreshToken: process.env['OAUTH_REFRESH_TOKEN'],
+    const result = gmailOAuthConfigSchema.safeParse({
+      user: env.MAIL_USER,
+      clientId: env.OAUTH_CLIENT_ID,
+      clientSecret: env.OAUTH_CLIENT_SECRET,
+      refreshToken: env.OAUTH_REFRESH_TOKEN,
     });
 
     if (result.success) {
@@ -109,17 +86,17 @@ class MailService {
    * Try to parse generic SMTP configuration from environment
    */
   private trySmtpConfig(): SmtpConfig | null {
-    if (!process.env['SMTP_HOST']) {
+    if (!env.SMTP_HOST) {
       logger.debug('SMTP configuration not available (SMTP_HOST not set)');
       return null;
     }
 
-    const result = SmtpConfigSchema.safeParse({
-      host: process.env['SMTP_HOST'],
-      port: process.env['SMTP_PORT'],
-      secure: process.env['SMTP_SECURE'] === 'true',
-      user: process.env['SMTP_USER'],
-      pass: process.env['SMTP_PASS'],
+    const result = smtpConfigSchema.safeParse({
+      host: env.SMTP_HOST,
+      port: env.SMTP_PORT,
+      secure: env.SMTP_SECURE,
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
     });
 
     if (result.success) {
@@ -172,24 +149,20 @@ class MailService {
    * @throws ApiError if mail service is not configured or sending fails
    */
   async sendActivationMail(to: string, activationLink: string): Promise<void> {
-    // Validate email address
-    const emailSchema = z.string().email('Invalid email address');
-    const validatedEmail = emailSchema.parse(to);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(to)) {
+      throw ApiError.BadRequest('Invalid email address');
+    }
+    const validatedEmail = to;
 
-    // Initialize transporter if needed
     this.initializeTransporter();
 
     if (!this.transporter) {
       throw ApiError.Internal('Mail transporter not available');
     }
 
-    // Email configuration from environment or defaults
-    const from =
-      process.env['MAIL_FROM'] ||
-      process.env['MAIL_USER'] ||
-      'no-reply@example.com';
-    const subject =
-      process.env['MAIL_ACTIVATION_SUBJECT'] || 'Activate your account';
+    const from = env.MAIL_FROM || env.MAIL_USER || 'no-reply@example.com';
+    const subject = env.MAIL_ACTIVATION_SUBJECT || 'Activate your account';
 
     const html = this.generateActivationEmailHtml(activationLink);
 
@@ -286,7 +259,6 @@ class MailService {
 
   /**
    * Check if mail service is configured and ready
-   * Useful for health checks
    */
   isConfigured(): boolean {
     try {
@@ -302,7 +274,7 @@ class MailService {
    * Should only be used in development
    */
   async sendTestEmail(to: string): Promise<void> {
-    if (process.env['NODE_ENV'] === 'production') {
+    if (env.NODE_ENV === 'production') {
       throw ApiError.Forbidden('Test emails not allowed in production');
     }
 

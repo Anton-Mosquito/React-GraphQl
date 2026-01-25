@@ -1,29 +1,9 @@
 import { format, parseISO } from 'date-fns';
-import { TMDBMovie } from '../../../types/index.js';
-import { env } from '../../../config/env.js';
-import { logger } from '../../../utils/index.js';
-import { Genre } from './Genre.js';
-
-interface ReleaseDateParams {
-  format?: string;
-}
-
-export interface MovieDTO {
-  id: number;
-  title: string;
-  originalTitle: string;
-  releaseDate: string;
-  posterPath: string;
-  adult: boolean;
-  overview: string;
-  originalLanguage: string;
-  backdropPath: string;
-  popularity: number;
-  voteCount: number;
-  video: boolean;
-  voteAverage: number;
-  genres?: { id: number; name: string }[];
-}
+import { ReleaseDateParams, MovieDTO } from '#types/index.js';
+import { TMDBMovie, TMDBGenre } from '#schema/index.js';
+import { env } from '#config/env.js';
+import { logger } from '#utils/index.js';
+import { Genre } from '#modules/index.js';
 
 export class Movie {
   public readonly id: number;
@@ -64,7 +44,7 @@ export class Movie {
       : '';
 
     if (movie.genres && movie.genres.length > 0) {
-      this.genres = movie.genres.map((g) => new Genre(g));
+      this.genres = movie.genres.map((g: TMDBGenre) => new Genre(g));
     }
   }
 

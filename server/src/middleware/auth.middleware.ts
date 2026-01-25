@@ -1,16 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-import tokenService, { TokenPayload } from '../modules/auth/token.service.js';
-import { ApiError } from '../utils/errors.js';
+import { Response, NextFunction } from 'express';
+import { TokenService } from '#modules/index.js';
+import { ApiError } from '#utils/index.js';
+import type { AuthRequest } from '#types/index.js';
 
-// Re-export TokenPayload for other modules
-export type { TokenPayload };
-
-// Extend Express Request with user property
-export interface AuthRequest extends Request {
-  user?: TokenPayload;
-}
-
-export default function authMiddleware(
+export function authMiddleware(
   req: AuthRequest,
   _res: Response,
   next: NextFunction,
@@ -34,7 +27,7 @@ export default function authMiddleware(
     return;
   }
 
-  const userData = tokenService.validateAccessToken(token);
+  const userData = TokenService.validateAccessToken(token);
   if (!userData) {
     next(ApiError.Unauthorized('Invalid or expired token'));
     return;

@@ -1,29 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
-import authService from './auth.service.js';
-import sessionService from './session.service.js';
-import activationService from './activation.service.js';
-import usersService from '../users/users.service.js';
-import { ApiError } from '../../utils/errors.js';
-
-/**
- * Helper function to extract refresh token from various sources
- */
-function extractRefreshToken(req: Request): string | undefined {
-  const cookies = (req as Request & { cookies?: Record<string, string> })
-    .cookies;
-
-  return (
-    req.body?.refreshToken ||
-    cookies?.['refreshToken'] ||
-    (typeof req.query?.['refreshToken'] === 'string'
-      ? req.query['refreshToken']
-      : undefined) ||
-    (typeof req.headers['authorization'] === 'string' &&
-    req.headers['authorization'].startsWith('Bearer ')
-      ? req.headers['authorization'].split(' ')[1]
-      : undefined)
-  );
-}
+import {
+  ActivationService,
+  UsersService,
+  SessionService,
+  AuthService,
+} from '#modules/index.js';
+import { extractRefreshToken, ApiError } from '#utils/index.js';
+import { env } from '#config/env.js';
 
 class AuthController {
   async registration(
@@ -32,7 +15,7 @@ class AuthController {
     next: NextFunction,
   ): Promise<Response | void> {
     try {
-      const data = await authService.register(req.body);
+      const data = await AuthService.register(req.body);
       return res.json(data);
     } catch (err) {
       return next(err);
@@ -45,7 +28,7 @@ class AuthController {
     next: NextFunction,
   ): Promise<Response | void> {
     try {
-      const data = await authService.login(req.body);
+      const data = await AuthService.login(req.body);
       return res.json(data);
     } catch (err) {
       return next(err);
@@ -64,7 +47,7 @@ class AuthController {
         return res.json({ message: 'No refresh token provided' });
       }
 
-      await authService.logout(refreshToken);
+      await AuthService.logout(refreshToken);
       return res.json({ message: 'Logged out successfully' });
     } catch (err) {
       return next(err);
@@ -84,11 +67,9 @@ class AuthController {
         return next(ApiError.BadRequest('Activation link is required'));
       }
 
-      await activationService.activate(link);
+      await ActivationService.activate(link);
 
-      // Redirect to client after successful activation
-      const clientUrl = process.env['CLIENT_URL'] || 'http://localhost:3000';
-      return res.redirect(clientUrl);
+      return res.redirect(env.CLIENT_URL);
     } catch (err) {
       return next(err);
     }
@@ -106,7 +87,7 @@ class AuthController {
         return next(ApiError.Unauthorized('No refresh token provided'));
       }
 
-      const data = await sessionService.refresh(refreshToken);
+      const data = await SessionService.refresh(refreshToken);
       return res.json(data);
     } catch (err) {
       return next(err);
@@ -119,7 +100,7 @@ class AuthController {
     next: NextFunction,
   ): Promise<Response | void> {
     try {
-      const users = await usersService.getAllUsers();
+      const users = await UsersService.getAllUsers();
       return res.json(users);
     } catch (err) {
       return next(err);

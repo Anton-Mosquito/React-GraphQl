@@ -25,6 +25,7 @@ export default defineConfig([
     },
     rules: {
       ...(tsRecommended.rules ?? {}),
+      '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
       'prettier/prettier': 'error',
     },
     settings: {

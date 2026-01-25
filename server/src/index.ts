@@ -1,42 +1,33 @@
-import fs from 'fs';
-import path from 'path';
-import express from 'express';
-import http from 'http';
-import expressWs from 'express-ws';
-import cookieParser from 'cookie-parser';
-import { WebSocket } from 'ws';
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@as-integrations/express5';
-import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import cors from 'cors';
-import { fileURLToPath } from 'url';
-import resolvers from './resolvers/index.js';
-import { env } from './config/env.js';
-import { logger } from './utils/index.js';
-import { GraphQLContext } from './types/index.js';
-import {
-  errorHandler,
-  securityHeaders,
-  requestLogger,
-} from './middleware/index.js';
-import restRouter from './rest/routes.js';
-import getUserFromAuthHeader from './utils/auth.context.js';
-import WebSocketController from './modules/drawing/websocket.controller.js';
-import type { ExtendedWebSocket } from './modules/drawing/websocket.types.js';
-import mailService from './modules/auth/mail.service.js';
+import { env } from '#config/env.js';
 import {
   apiLimiter,
-  authLimiter,
+  errorHandler,
   graphqlLimiter,
-  activationLimiter,
-} from './middleware/rate-limit.js';
+  requestLogger,
+  securityHeaders,
+} from '#middleware/index.js';
+import { MailService, websocketController } from '#modules/index.js';
+import { ExtendedWebSocket, GraphQLContext } from '#types/index.js';
+import { getUserFromAuthHeader, logger } from '#utils/index.js';
+import { ApolloServer } from '@apollo/server';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { expressMiddleware } from '@as-integrations/express5';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express from 'express';
+import expressWs from 'express-ws';
+import fs from 'fs';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { WebSocket } from 'ws';
+import resolvers from './resolvers/index.js';
+import restRouter from './rest/routes.js';
 
-// ES modules compatibility
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load GraphQL schema
 const typeDefs = fs.readFileSync(
   path.join(__dirname, 'schema.graphql'),
   'utf8',
@@ -51,13 +42,11 @@ async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
-  // attach express-ws for websocket routes (bind to the same http server)
   const wsInstance = expressWs(app, httpServer);
   const wsApp = wsInstance.app as express.Application;
   const wss = wsInstance.getWss();
-  const wsController = new WebSocketController(wss);
+  const wsController = new websocketController(wss);
 
-  // WebSocket statistics endpoint (optional, for monitoring)
   app.get('/ws-stats', (_req, res) => {
     const stats = wsController.getStats();
 
@@ -128,7 +117,7 @@ async function startApolloServer() {
   const corsOptions = {
     origin:
       env.NODE_ENV === 'production'
-        ? process.env['ALLOWED_ORIGINS']?.split(',') || []
+        ? env.ALLOWED_ORIGINS?.split(',') || []
         : '*',
     credentials: true,
   };
@@ -138,29 +127,14 @@ async function startApolloServer() {
   app.use(cors<cors.CorsRequest>(corsOptions));
   app.use(express.json({ limit: '10mb' }));
 
-  // Apply rate limiting (production only)
-  if (env.NODE_ENV === 'production') {
-    // Protect sensitive auth endpoints explicitly
-    app.use('/api/registration', authLimiter);
-    app.use('/api/login', authLimiter);
-    app.use('/api/activate/:link', activationLimiter);
-
-    // General API + GraphQL limits
-    app.use('/api', apiLimiter);
-    app.use('/graphql', graphqlLimiter);
-
-    logger.info('Rate limiting enabled for production');
-  } else {
-    logger.info('Rate limiting disabled in development mode');
-  }
-
-  // REST routes
-  app.use('/api', restRouter);
+  // REST routes (rate-limited)
+  app.use('/api', apiLimiter, restRouter);
 
   // GraphQL endpoint with auth-aware context
   app.use(
     '/graphql',
     express.json({ limit: '10mb' }),
+    graphqlLimiter,
     expressMiddleware(server, {
       context: async ({ req, res }: ContextParams): Promise<GraphQLContext> => {
         const locale = (req.headers['locale'] as string | undefined) || 'en-US';
@@ -184,7 +158,7 @@ async function startApolloServer() {
 
   // Health check endpoint
   app.get('/health', (_req, res) => {
-    const mailConfigured = mailService.isConfigured();
+    const mailConfigured = MailService.isConfigured();
 
     res.json({
       status: 'ok',

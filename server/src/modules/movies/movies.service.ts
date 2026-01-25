@@ -1,11 +1,14 @@
-import * as moviesApi from './index.js';
-import { getList as getGenresList } from '../genres/index.js';
+import { moviesFilterInputSchema, movieIdsInputSchema } from '#schema/index.js';
+import { logger } from '#utils/logger.js';
 import {
-  MoviesFilterInputSchema,
-  MovieIdsInputSchema,
-} from '../../types/graphql.schemas.js';
-import { logger } from '../../utils/logger.js';
-import { Movies, Movie, Genre } from './entities/index.js';
+  Movies,
+  Movie,
+  Genre,
+  getList,
+  discoverMovie,
+  getDetails,
+  getPopular,
+} from '#modules/index.js';
 
 class MoviesService {
   /**
@@ -13,16 +16,14 @@ class MoviesService {
    * Validates filter input and delegates to TMDB API
    */
   async getMovies(filter: unknown, locale: string = 'en-US'): Promise<Movies> {
-    // Validate and parse filter input
-    const validatedFilter = MoviesFilterInputSchema.parse(filter ?? {});
+    const validatedFilter = moviesFilterInputSchema.parse(filter ?? {});
 
     logger.debug('MoviesService.getMovies', {
       filter: validatedFilter,
       locale,
     });
 
-    // Delegate to TMDB API
-    return moviesApi.discoverMovie(validatedFilter ?? {}, locale);
+    return discoverMovie(validatedFilter ?? {}, locale);
   }
 
   /**
@@ -33,17 +34,15 @@ class MoviesService {
     ids: unknown,
     locale: string = 'en-US',
   ): Promise<Movie[]> {
-    // Validate IDs input
-    const validatedIds = MovieIdsInputSchema.parse(ids);
+    const validatedIds = movieIdsInputSchema.parse(ids);
 
     logger.debug('MoviesService.getMoviesByIds', {
       count: validatedIds.length,
       locale,
     });
 
-    // Fetch all movies in parallel
-    const moviePromises = validatedIds.map((id) =>
-      moviesApi.getDetails(id, locale),
+    const moviePromises = validatedIds.map((id: number) =>
+      getDetails(id, locale),
     );
 
     const movies = await Promise.all(moviePromises);
@@ -61,7 +60,7 @@ class MoviesService {
   async getGenres(locale: string = 'en-US'): Promise<Genre[]> {
     logger.debug('MoviesService.getGenres', { locale });
 
-    return getGenresList(locale);
+    return getList(locale);
   }
 
   /**
@@ -74,7 +73,7 @@ class MoviesService {
   ): Promise<Movies> {
     logger.debug('MoviesService.getPopularMovies', { page, locale });
 
-    return moviesApi.getPopular(page, locale);
+    return getPopular(page, locale);
   }
 }
 

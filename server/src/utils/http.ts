@@ -1,6 +1,5 @@
 import { z } from 'zod';
-import { TMDBApiError } from './errors.js';
-import { logger } from './logger.js';
+import { TMDBApiError, logger } from '#utils/index.js';
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -152,7 +151,6 @@ export class HttpClient {
     }
   }
 
-  // Overload: validated response with Zod schema
   async post<T, D = unknown>(
     endpoint: string,
     data: D | undefined,
@@ -160,7 +158,6 @@ export class HttpClient {
     schema: z.ZodType<T>,
   ): Promise<FetchResponse<T>>;
 
-  // Overload: unvalidated response (returns unknown)
   async post(
     endpoint: string,
     data?: unknown,

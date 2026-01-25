@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import validateMiddleware from '../middleware/validate.middleware.js';
-import authMiddleware from '../middleware/auth.middleware.js';
-import { authLimiter, activationLimiter } from '../middleware/rate-limit.js';
 import {
-  registrationSchema,
-  loginSchema,
-} from '../modules/auth/auth.schema.js';
-import authController from '../modules/auth/auth.controller.js';
+  validateMiddleware,
+  authMiddleware,
+  authLimiter,
+  activationLimiter,
+} from '#middleware/index.js';
+import { registrationSchema, loginSchema } from '#schema/auth.schema.js';
+import { AuthController } from '#modules/index.js';
 
 const router = Router();
 
@@ -14,25 +14,25 @@ router.post(
   '/registration',
   authLimiter,
   validateMiddleware(registrationSchema),
-  authController.registration.bind(authController),
+  AuthController.registration.bind(AuthController),
 );
 router.post(
   '/login',
   authLimiter,
   validateMiddleware(loginSchema),
-  authController.login.bind(authController),
+  AuthController.login.bind(AuthController),
 );
-router.post('/logout', authController.logout.bind(authController));
+router.post('/logout', AuthController.logout.bind(AuthController));
 router.get(
   '/activate/:link',
   activationLimiter,
-  authController.activate.bind(authController),
+  AuthController.activate.bind(AuthController),
 );
-router.get('/refresh', authController.refresh.bind(authController));
+router.get('/refresh', AuthController.refresh.bind(AuthController));
 router.get(
   '/users',
   authMiddleware,
-  authController.getUsers.bind(authController),
+  AuthController.getUsers.bind(AuthController),
 );
 
 export default router;

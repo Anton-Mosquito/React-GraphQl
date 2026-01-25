@@ -1,4 +1,4 @@
-import { Resolvers } from '../types/index.js';
+import { Resolvers } from '#types/index.js';
 import Query from './Query.js';
 import Movie from './Movie.js';
 

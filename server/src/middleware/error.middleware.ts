@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { logger } from '../utils/index.js';
+import { env } from '#config/env.js';
 
 export function errorHandler(
   err: Error,
@@ -14,8 +15,7 @@ export function errorHandler(
 
   res.status(500).json({
     error: 'Internal Server Error',
-    message:
-      process.env['NODE_ENV'] === 'development' ? err.message : undefined,
+    message: env.NODE_ENV === 'development' ? err.message : undefined,
   });
 }
 

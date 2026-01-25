@@ -14,6 +14,3 @@ export class ValidationError extends GraphQLError {
     });
   }
 }
-
-// Note: Movie filter and IDs validation now handled by Zod schemas
-// See: server/src/types/graphql.schemas.ts

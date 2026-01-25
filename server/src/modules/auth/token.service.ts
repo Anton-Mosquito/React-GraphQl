@@ -1,19 +1,9 @@
-import jwt from 'jsonwebtoken';
+import { env } from '#config/env.js';
+import { ApiError, logger } from '#utils/index.js';
+import { tokenPayloadSchema, type TokenPayload } from '#schema/index.js';
 import type { Secret, SignOptions } from 'jsonwebtoken';
-import { z } from 'zod';
+import jwt from 'jsonwebtoken';
 import prisma from '../../lib/db.js';
-import { ApiError } from '../../utils/errors.js';
-import { env } from '../../config/env.js';
-import { logger } from '../../utils/index.js';
-
-// Zod schema for JWT payload validation
-const TokenPayloadSchema = z.object({
-  id: z.uuid(),
-  email: z.email(),
-  isActivated: z.boolean(),
-});
-
-export type TokenPayload = z.infer<typeof TokenPayloadSchema>;
 
 class TokenService {
   private accessSecret: Secret;
@@ -22,7 +12,6 @@ class TokenService {
   private refreshExpiresIn: string;
 
   constructor() {
-    // Use validated env values; no fallback secrets
     this.accessSecret = env.JWT_ACCESS_SECRET;
     this.refreshSecret = env.JWT_REFRESH_SECRET;
     this.accessExpiresIn = env.JWT_ACCESS_EXPIRES_IN;
@@ -38,7 +27,7 @@ class TokenService {
     accessToken: string;
     refreshToken: string;
   } {
-    const validatedPayload = TokenPayloadSchema.parse(payload);
+    const validatedPayload = tokenPayloadSchema.parse(payload);
 
     const accessToken = jwt.sign(
       validatedPayload as object,
@@ -110,7 +99,7 @@ class TokenService {
   validateAccessToken(token: string): TokenPayload | null {
     try {
       const decoded = jwt.verify(token, this.accessSecret as Secret);
-      return TokenPayloadSchema.parse(decoded as object);
+      return tokenPayloadSchema.parse(decoded as object);
     } catch {
       return null;
     }
@@ -123,7 +112,7 @@ class TokenService {
   validateRefreshToken(token: string): TokenPayload | null {
     try {
       const decoded = jwt.verify(token, this.refreshSecret as Secret);
-      return TokenPayloadSchema.parse(decoded as object);
+      return tokenPayloadSchema.parse(decoded as object);
     } catch {
       return null;
     }

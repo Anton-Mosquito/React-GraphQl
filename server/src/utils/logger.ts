@@ -1,3 +1,5 @@
+import { env } from '#config/env.js';
+
 type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 class Logger {
@@ -25,7 +27,7 @@ class Logger {
   }
 
   debug(message: string, meta?: unknown): void {
-    if (process.env['NODE_ENV'] === 'development') {
+    if (env.NODE_ENV === 'development') {
       this.log('debug', message, meta);
     }
   }

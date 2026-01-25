@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
-import type { TokenPayload } from '../modules/auth/token.service.js';
-import type { MoviesFilterInput, MovieIdsInput } from './graphql.schemas.js';
+import type { TokenPayload, MoviesFilterInput } from '#schema/index.js';
 
 export interface GraphQLContext {
   locale: string;
@@ -9,14 +8,6 @@ export interface GraphQLContext {
   user: TokenPayload | null;
 }
 
-// Re-export schemas and types
-export type { MoviesFilterInput, MovieIdsInput };
-export {
-  MoviesFilterInputSchema,
-  MovieIdsInputSchema,
-} from './graphql.schemas.js';
-
-// Legacy interface for backward compatibility (can be removed later)
 export interface MoviesFilterArgs {
   filter?: MoviesFilterInput;
 }

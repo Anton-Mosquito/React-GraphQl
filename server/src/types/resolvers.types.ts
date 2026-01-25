@@ -1,10 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { GraphQLContext, MoviesFilterInput } from './graphql.types.js';
-import { Movie } from '../modules/movies/entities/index.js';
-import { Movies } from '../modules/movies/entities/index.js';
-import { Genre } from '../modules/movies/entities/index.js';
+import { GraphQLContext } from './graphql.types.js';
+import { Movie, Movies, Genre } from '#modules/index.js';
+import { MoviesFilterInput } from '#schema/index.js';
 
-// Parent types for resolvers
 export type MovieParent = Movie;
 export type MoviesParent = Movies;
 

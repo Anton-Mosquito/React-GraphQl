@@ -1,10 +1,7 @@
-import { z } from 'zod';
 import prisma from '../../lib/db.js';
-import UserDto from './dtos/user.dto.js';
-import { ApiError } from '../../utils/errors.js';
-import { logger } from '../../utils/logger.js';
-
-const UserIdSchema = z.string().uuid('Invalid user ID format');
+import { userIdSchema } from '#schema/index.js';
+import { ApiError, logger } from '#utils/index.js';
+import { UserDto } from '#modules/index.js';
 
 class UsersService {
   /**
@@ -36,7 +33,7 @@ class UsersService {
    * Get user by ID
    */
   async getUserById(input: unknown): Promise<UserDto> {
-    const userId = UserIdSchema.parse(input);
+    const userId = userIdSchema.parse(input);
 
     logger.debug('UsersService.getUserById', { userId });
 
@@ -64,7 +61,7 @@ class UsersService {
    * Delete user by ID (future feature)
    */
   async deleteUser(input: unknown): Promise<void> {
-    const userId = UserIdSchema.parse(input);
+    const userId = userIdSchema.parse(input);
 
     logger.debug('UsersService.deleteUser', { userId });
 
@@ -76,12 +73,10 @@ class UsersService {
       throw ApiError.NotFound('User not found');
     }
 
-    // Delete user's tokens first
     await prisma.token.deleteMany({
       where: { userId },
     });
 
-    // Delete user
     await prisma.user.delete({
       where: { id: userId },
     });

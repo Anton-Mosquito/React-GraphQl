@@ -42,6 +42,25 @@ const envSchema = z.object({
   // JWT Expiration (optional with defaults)
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
+
+  // CORS
+  ALLOWED_ORIGINS: z.string().optional(),
+
+  // Mail
+  MAIL_USER: z.string().min(1),
+  OAUTH_CLIENT_ID: z.string().min(1),
+  OAUTH_CLIENT_SECRET: z.string().min(1),
+  OAUTH_REFRESH_TOKEN: z.string().min(1),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().optional(),
+  SMTP_SECURE: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  MAIL_FROM: z.string().email().optional(),
+  MAIL_ACTIVATION_SUBJECT: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

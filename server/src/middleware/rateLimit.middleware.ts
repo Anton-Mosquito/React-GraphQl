@@ -1,10 +1,7 @@
 import rateLimit, { type Options } from 'express-rate-limit';
 import type { Request, Response } from 'express';
-import { logger } from '../utils/logger.js';
+import { logger } from '#utils/index.js';
 
-/**
- * Default handler used by limiters to centralize logging
- */
 function createHandler(message: string) {
   return (req: Request, res: Response) => {
     logger.warn(message, {

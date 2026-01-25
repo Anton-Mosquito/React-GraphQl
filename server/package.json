@@ -24,6 +24,14 @@
     "validate": "npm run type-check && npm run lint && npm run format:check",
     "clean": "rm -rf dist node_modules/.cache"
   },
+  "imports": {
+    "#schema/*.js": "./dist/schema/*.js",
+    "#modules/*.js": "./dist/modules/*.js",
+    "#types/*.js": "./dist/types/*.js",
+    "#utils/*.js": "./dist/utils/*.js",
+    "#middleware/*.js": "./dist/middleware/*.js",
+    "#config/*.js": "./dist/config/*.js"
+  },
   "keywords": [
     "graphql",
     "apollo-server",

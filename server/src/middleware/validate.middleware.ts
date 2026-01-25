@@ -1,14 +1,14 @@
 import { Request, Response, NextFunction } from 'express';
 import { ZodType, ZodError } from 'zod';
-import { ApiError } from '../utils/errors.js';
+import { ApiError } from '#utils/index.js';
 
-export default function validateMiddleware<T extends ZodType<unknown, unknown>>(
+export function validateMiddleware<T extends ZodType<unknown, unknown>>(
   schema: T,
 ) {
   return (req: Request, _res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse(req.body);
-      // replace body with the parsed/validated value
+
       req.body = parsed;
       next();
     } catch (err) {

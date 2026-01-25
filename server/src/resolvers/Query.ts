@@ -1,6 +1,6 @@
-import moviesService from '../modules/movies/movies.service.js';
-import { QueryResolvers } from '../types/index.js';
-import { logger } from '../utils/index.js';
+import { moviesService } from '#modules/index.js';
+import { QueryResolvers } from '#types/index.js';
+import { logger } from '#utils/index.js';
 import { GraphQLError } from 'graphql';
 
 const queryResolvers: QueryResolvers = {
@@ -22,7 +22,6 @@ const queryResolvers: QueryResolvers = {
         filter: args.filter,
       });
 
-      // Re-throw GraphQL-friendly error
       if (error instanceof Error) {
         throw new GraphQLError(error.message, {
           extensions: {
@@ -54,7 +53,6 @@ const queryResolvers: QueryResolvers = {
         idsCount: ids?.length ?? 0,
       });
 
-      // Re-throw GraphQL-friendly error
       if (error instanceof Error) {
         throw new GraphQLError(error.message, {
           extensions: {
@@ -82,7 +80,6 @@ const queryResolvers: QueryResolvers = {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
 
-      // Re-throw GraphQL-friendly error
       if (error instanceof Error) {
         throw new GraphQLError(error.message, {
           extensions: {

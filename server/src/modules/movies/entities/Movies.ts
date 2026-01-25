@@ -1,5 +1,5 @@
-import { TMDBMoviesResponse } from '../../../types/index.js';
-import { Movie } from './Movie.js';
+import { TMDBMoviesResponse, TMDBMovie } from '#schema/index.js';
+import { Movie } from '#modules/index.js';
 
 export class Movies {
   public readonly page: number;
@@ -11,7 +11,9 @@ export class Movies {
     this.page = moviesResponse.page;
     this.totalResults = moviesResponse.total_results;
     this.totalPages = moviesResponse.total_pages;
-    this.results = moviesResponse.results.map((movie) => new Movie(movie));
+    this.results = moviesResponse.results.map(
+      (movie: TMDBMovie) => new Movie(movie),
+    );
   }
 
   toJSON() {
