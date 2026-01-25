@@ -1,5 +1,6 @@
-import { logger } from './logger.js';
+import { z } from 'zod';
 import { TMDBApiError } from './errors.js';
+import { logger } from './logger.js';
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -60,14 +61,22 @@ export class HttpClient {
     };
   }
 
-  async get<T>(
+  /**
+   * GET request with Zod schema validation
+   * @param endpoint - API endpoint
+   * @param schema - Zod schema for response validation
+   * @param options - Fetch options
+   * @returns Validated response data
+   */
+  async getValidated<T extends z.ZodType>(
     endpoint: string,
+    schema: T,
     options: FetchOptions = {},
-  ): Promise<FetchResponse<T>> {
+  ): Promise<FetchResponse<z.infer<T>>> {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
-    logger.debug('HTTP GET request', { url, params });
+    logger.debug('HTTP GET request (validated)', { url, params });
 
     try {
       const response = await fetchWithTimeout(
@@ -98,13 +107,31 @@ export class HttpClient {
         );
       }
 
-      const data = await response.json();
+      const rawData = await response.json();
 
-      return {
-        data: data as T,
-        status: response.status,
-        statusText: response.statusText,
-      };
+      // Validate response with Zod schema
+      try {
+        const validatedData = schema.parse(rawData);
+
+        return {
+          data: validatedData,
+          status: response.status,
+          statusText: response.statusText,
+        };
+      } catch (validationError) {
+        logger.error('Response validation failed', {
+          url,
+          error:
+            validationError instanceof Error
+              ? validationError.message
+              : 'Unknown validation error',
+        });
+        throw new TMDBApiError(
+          'Invalid response format from TMDB API',
+          502,
+          validationError,
+        );
+      }
     } catch (error) {
       if (error instanceof TMDBApiError) {
         throw error;
@@ -125,11 +152,27 @@ export class HttpClient {
     }
   }
 
+  // Overload: validated response with Zod schema
   async post<T, D = unknown>(
+    endpoint: string,
+    data: D | undefined,
+    options: FetchOptions,
+    schema: z.ZodType<T>,
+  ): Promise<FetchResponse<T>>;
+
+  // Overload: unvalidated response (returns unknown)
+  async post(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions,
+  ): Promise<FetchResponse<unknown>>;
+
+  async post<T = unknown, D = unknown>(
     endpoint: string,
     data?: D,
     options: FetchOptions = {},
-  ): Promise<FetchResponse<T>> {
+    schema?: z.ZodType<T>,
+  ): Promise<FetchResponse<T> | FetchResponse<unknown>> {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
@@ -167,18 +210,46 @@ export class HttpClient {
 
       const responseData = await response.json();
 
+      if (schema) {
+        try {
+          const validated = schema.parse(responseData);
+          return {
+            data: validated,
+            status: response.status,
+            statusText: response.statusText,
+          } as FetchResponse<T>;
+        } catch (validationError) {
+          logger.error('Response validation failed (POST)', {
+            url,
+            error:
+              validationError instanceof Error
+                ? validationError.message
+                : String(validationError),
+          });
+          throw new TMDBApiError(
+            'Invalid response format from TMDB API',
+            502,
+            validationError,
+          );
+        }
+      }
+
+      // No schema provided — return unknown payload
       return {
-        data: responseData as T,
+        data: responseData as unknown,
         status: response.status,
         statusText: response.statusText,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof TMDBApiError) {
         throw error;
       }
 
-      logger.error('POST request error', { url, error });
-      throw new TMDBApiError('Request failed', undefined, error);
+      logger.error('POST request error', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw new TMDBApiError('Request failed', undefined, error as unknown);
     }
   }
 }

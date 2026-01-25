@@ -3,7 +3,7 @@ import { env } from '../../config/env.js';
 import { logger } from '../../utils/index.js';
 import { TMDBApiError } from '../../utils/index.js';
 import { createTMDBClient } from '../../utils/index.js';
-import { TMDBGenresResponse } from '../../types/index.js';
+import { TMDBGenresResponseSchema } from '../../types/index.js';
 
 /**
  * Get list of movie genres from TMDB
@@ -13,8 +13,9 @@ import { TMDBGenresResponse } from '../../types/index.js';
 export async function getList(language: string = 'en-US'): Promise<Genre[]> {
   try {
     const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
-    const response = await tmdbClient.get<TMDBGenresResponse>(
+    const response = await tmdbClient.getValidated(
       '/genre/movie/list',
+      TMDBGenresResponseSchema,
       {
         params: {
           api_key: env.TMDB_API_KEY,

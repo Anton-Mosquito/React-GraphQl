@@ -1,5 +1,5 @@
 import { GraphQLResolveInfo } from 'graphql';
-import { GraphQLContext } from './graphql.types.js';
+import { GraphQLContext, MoviesFilterInput } from './graphql.types.js';
 import { Movie } from '../modules/movies/entities/index.js';
 import { Movies } from '../modules/movies/entities/index.js';
 import { Genre } from '../modules/movies/entities/index.js';
@@ -12,7 +12,7 @@ export type MoviesParent = Movies;
 export type QueryResolvers = {
   movies: (
     parent: unknown,
-    args: { filter?: any },
+    args: { filter?: MoviesFilterInput },
     context: GraphQLContext,
     info: GraphQLResolveInfo,
   ) => Promise<Movies>;

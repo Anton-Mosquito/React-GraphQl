@@ -1,80 +1,130 @@
 import jwt from 'jsonwebtoken';
+import type { Secret, SignOptions } from 'jsonwebtoken';
+import { z } from 'zod';
 import prisma from '../../lib/db.js';
 import { ApiError } from '../../utils/errors.js';
+import { env } from '../../config/env.js';
+import { logger } from '../../utils/index.js';
 
-const ACCESS_TOKEN_SECRET =
-  process.env.JWT_ACCESS_SECRET ||
-  process.env.JWT_ACCESS_TOKEN_SECRET ||
-  'access-secret';
-const REFRESH_TOKEN_SECRET =
-  process.env.JWT_REFRESH_SECRET ||
-  process.env.JWT_REFRESH_TOKEN_SECRET ||
-  'refresh-secret';
+// Zod schema for JWT payload validation
+const TokenPayloadSchema = z.object({
+  id: z.uuid(),
+  email: z.email(),
+  isActivated: z.boolean(),
+});
 
-const ACCESS_TOKEN_EXPIRES_IN = process.env.JWT_ACCESS_EXPIRES_IN || '15m';
-const REFRESH_TOKEN_EXPIRES_IN = process.env.JWT_REFRESH_EXPIRES_IN || '30d';
+export type TokenPayload = z.infer<typeof TokenPayloadSchema>;
 
 class TokenService {
-  generateTokens(payload: unknown) {
+  private accessSecret: Secret;
+  private refreshSecret: Secret;
+  private accessExpiresIn: string;
+  private refreshExpiresIn: string;
+
+  constructor() {
+    // Use validated env values; no fallback secrets
+    this.accessSecret = env.JWT_ACCESS_SECRET;
+    this.refreshSecret = env.JWT_REFRESH_SECRET;
+    this.accessExpiresIn = env.JWT_ACCESS_EXPIRES_IN;
+    this.refreshExpiresIn = env.JWT_REFRESH_EXPIRES_IN;
+  }
+
+  /**
+   * Generate access and refresh tokens
+   * @param payload - User data to encode in token
+   * @returns Object with accessToken and refreshToken
+   */
+  generateTokens(payload: TokenPayload): {
+    accessToken: string;
+    refreshToken: string;
+  } {
+    const validatedPayload = TokenPayloadSchema.parse(payload);
+
     const accessToken = jwt.sign(
-      payload as string | object | Buffer,
-      ACCESS_TOKEN_SECRET as jwt.Secret,
-      {
-        expiresIn: ACCESS_TOKEN_EXPIRES_IN,
-      } as jwt.SignOptions,
+      validatedPayload as object,
+      this.accessSecret as Secret,
+      { expiresIn: this.accessExpiresIn } as unknown as SignOptions,
     );
 
     const refreshToken = jwt.sign(
-      payload as string | object | Buffer,
-      REFRESH_TOKEN_SECRET as jwt.Secret,
-      {
-        expiresIn: REFRESH_TOKEN_EXPIRES_IN,
-      } as jwt.SignOptions,
+      validatedPayload as object,
+      this.refreshSecret as Secret,
+      { expiresIn: this.refreshExpiresIn } as unknown as SignOptions,
     );
 
     return { accessToken, refreshToken };
   }
 
-  async saveToken(userId: string, refreshToken: string) {
+  /**
+   * Save refresh token to database
+   * Removes old tokens for the user before saving new one
+   */
+  async saveToken(userId: string, refreshToken: string): Promise<void> {
     try {
-      // Upsert semantics: delete existing token for user or create new
       await prisma.token.deleteMany({ where: { userId } });
-      return prisma.token.create({
+      await prisma.token.create({
         data: { refreshToken, userId },
       });
     } catch (error) {
+      logger.error('Failed to save refresh token', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw ApiError.Internal('Failed to save refresh token');
     }
   }
 
-  async removeToken(refreshToken: string) {
+  /**
+   * Remove refresh token from database
+   */
+  async removeToken(refreshToken: string): Promise<void> {
     try {
-      return prisma.token.deleteMany({ where: { refreshToken } });
+      await prisma.token.deleteMany({ where: { refreshToken } });
     } catch (error) {
+      logger.error('Failed to remove refresh token', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw ApiError.Internal('Failed to remove refresh token');
     }
   }
 
-  async findToken(refreshToken: string) {
+  /**
+   * Find refresh token in database
+   */
+  async findToken(
+    refreshToken: string,
+  ): Promise<{ id: string; refreshToken: string; userId: string } | null> {
     try {
-      return prisma.token.findUnique({ where: { refreshToken } });
+      return await prisma.token.findUnique({ where: { refreshToken } });
     } catch (error) {
+      logger.error('Failed to find refresh token', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       throw ApiError.Internal('Failed to find refresh token');
     }
   }
 
-  validateAccessToken<T = any>(token: string): T | null {
+  /**
+   * Validate access token and return decoded payload
+   * @returns Validated payload or null if token is invalid
+   */
+  validateAccessToken(token: string): TokenPayload | null {
     try {
-      return jwt.verify(token, ACCESS_TOKEN_SECRET) as T;
-    } catch (e) {
+      const decoded = jwt.verify(token, this.accessSecret as Secret);
+      return TokenPayloadSchema.parse(decoded as object);
+    } catch {
       return null;
     }
   }
 
-  validateRefreshToken<T = any>(token: string): T | null {
+  /**
+   * Validate refresh token and return decoded payload
+   * @returns Validated payload or null if token is invalid
+   */
+  validateRefreshToken(token: string): TokenPayload | null {
     try {
-      return jwt.verify(token, REFRESH_TOKEN_SECRET) as T;
-    } catch (e) {
+      const decoded = jwt.verify(token, this.refreshSecret as Secret);
+      return TokenPayloadSchema.parse(decoded as object);
+    } catch {
       return null;
     }
   }

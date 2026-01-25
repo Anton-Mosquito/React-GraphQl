@@ -1,3 +1,215 @@
+# Movie GraphQL Server
+
+Modern GraphQL + REST API server built with TypeScript, Apollo Server, Express, and Prisma.
+
+## 🚀 Features
+
+- **GraphQL API** - Apollo Server with type-safe resolvers
+- **REST API** - Express endpoints for authentication
+- **Database** - PostgreSQL with Prisma ORM
+- **Authentication** - JWT-based auth with refresh tokens
+- **Email** - Account activation via Gmail OAuth2 or SMTP
+- **WebSocket** - Real-time collaborative drawing
+- **Type Safety** - Strict TypeScript with Zod runtime validation
+- **Rate Limiting** - Protection against API abuse
+- **TMDB Integration** - Movie data from The Movie Database API
+
+## 📋 Prerequisites
+
+- Node.js >= 18.0.0
+- PostgreSQL database
+- TMDB API key
+- (Optional) Gmail OAuth2 credentials for email
+
+## 🛠️ Installation
+```bash
+# Install dependencies
+npm install
+
+# Generate Prisma client
+npm run prisma:generate
+
+# Push database schema
+npm run prisma:push
+```
+
+## ⚙️ Configuration
+
+Create `.env` file in project root:
+```bash
+# Server
+PORT=5001
+NODE_ENV=development
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/moviedb
+
+# URLs
+CLIENT_URL=http://localhost:3000
+API_URL=http://localhost:5001
+
+# TMDB API
+TMDB_API_KEY=your_tmdb_api_key
+TMDB_API_BASE_URL=https://api.themoviedb.org/3
+TMDB_IMAGE_BASE_PATH=https://image.tmdb.org/t/p/w500
+
+# Email (Gmail OAuth2 - Recommended)
+MAIL_USER=your-email@gmail.com
+OAUTH_CLIENT_ID=your_oauth_client_id
+OAUTH_CLIENT_SECRET=your_oauth_client_secret
+OAUTH_REFRESH_TOKEN=your_oauth_refresh_token
+
+# Email (Alternative: Generic SMTP)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your_smtp_user
+SMTP_PASS=your_smtp_password
+
+# JWT (MUST be 32+ characters)
+JWT_ACCESS_SECRET=your_32_char_minimum_access_secret_here
+JWT_REFRESH_SECRET=your_32_char_minimum_refresh_secret_here
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=30d
+
+# SMTP Service (required)
+SMTP_SERVICE=gmail
+GOOGLE_CLIENT=your_google_client
+GOOGLE_CLIENT_ID=same_as_OAUTH_CLIENT_ID
+GOOGLE_CLIENT_SECRET=same_as_OAUTH_CLIENT_SECRET
+GOOGLE_REFRESH_TOKEN=same_as_OAUTH_REFRESH_TOKEN
+```
+
+## 🏃 Running
+```bash
+# Development mode with hot reload
+npm run dev
+
+# Production build
+npm run build
+npm start
+
+# Database management
+npm run prisma:studio    # Open Prisma Studio
+npm run prisma:migrate   # Create migration
+```
+
+## 🧪 Code Quality
+```bash
+# Type checking
+npm run type-check
+
+# Linting
+npm run lint
+npm run lint:fix
+
+# Formatting
+npm run format
+npm run format:check
+
+# Run all checks
+npm run validate
+```
+
+## 📡 API Endpoints
+
+### GraphQL
+- **Endpoint**: `http://localhost:5001/graphql`
+- **Playground**: Available in development mode
+
+### REST
+- `POST /api/registration` - Register new user
+- `POST /api/login` - Login user
+- `POST /api/logout` - Logout user
+- `GET /api/activate/:link` - Activate account
+- `GET /api/refresh` - Refresh access token
+- `GET /api/users` - Get all users (protected)
+
+### System
+- `GET /health` - Health check
+- `GET /ws-stats` - WebSocket statistics
+
+### WebSocket
+- `ws://localhost:5001/` - Real-time drawing
+
+## 🔒 Security Features
+
+- **Rate Limiting**:
+  - Auth endpoints: 5 req/15min
+  - API endpoints: 100 req/15min
+  - GraphQL: 200 req/15min
+  - Activation: 10 req/hour
+
+- **JWT Authentication**: Secure access & refresh tokens
+- **Password Hashing**: bcrypt with cost factor 12
+- **Input Validation**: Zod schemas for runtime validation
+- **CORS**: Configurable origin whitelist
+- **Security Headers**: X-Frame-Options, XSS Protection, etc.
+
+## 📚 Documentation
+
+- [WebSocket API](./docs/WEBSOCKET_API.md)
+- [Mail Configuration](./docs/MAIL_CONFIGURATION.md)
+- [Architecture](../ARCHITECTURE.md)
+
+## 🏗️ Architecture
+```
+server/
+├── src/
+│   ├── config/          # Environment configuration
+│   ├── lib/             # Database client
+│   ├── middleware/      # Express middleware
+│   ├── modules/         # Feature modules
+│   │   ├── auth/        # Authentication
+│   │   ├── users/       # User management
+│   │   ├── movies/      # Movie services
+│   │   ├── genres/      # Genre services
+│   │   └── drawing/     # WebSocket drawing
+│   ├── resolvers/       # GraphQL resolvers
+│   ├── rest/            # REST routes
+│   ├── types/           # TypeScript types & Zod schemas
+│   ├── utils/           # Utilities
+│   ├── schema.graphql   # GraphQL schema
+│   └── index.ts         # Server entry point
+├── prisma/
+│   └── schema.prisma    # Database schema
+└── docs/                # Documentation
+```
+
+## 🧩 Tech Stack
+
+- **Runtime**: Node.js with ES Modules
+- **Language**: TypeScript (strict mode)
+- **Server**: Express + Apollo Server
+- **Database**: PostgreSQL + Prisma
+- **Validation**: Zod
+- **Authentication**: JWT + bcrypt
+- **Email**: Nodemailer
+- **WebSocket**: ws + express-ws
+- **External API**: TMDB (The Movie Database)
+
+## 📝 Scripts Reference
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm start` - Run production server
+- `npm run type-check` - Check TypeScript types
+- `npm run lint` - Lint code
+- `npm run format` - Format code
+- `npm run validate` - Run all checks
+- `npm run clean` - Clean build artifacts
+
+## 🤝 Contributing
+
+1. Follow TypeScript strict mode
+2. Use Zod for runtime validation
+3. Add JSDoc comments to public methods
+4. Run `npm run validate` before committing
+5. Follow existing code structure
+
+## 📄 License
+
+ISC
 # Movie Database GraphQL Server
 
 TypeScript-based GraphQL server for The Movie Database (TMDB) API with Apollo Server 5.

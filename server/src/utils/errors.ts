@@ -67,7 +67,7 @@ export class TMDBApiError extends AppError {
     Object.setPrototypeOf(this, TMDBApiError.prototype);
   }
 
-  toJSON() {
+  override toJSON() {
     return {
       ...super.toJSON(),
       originalError: this.originalError,

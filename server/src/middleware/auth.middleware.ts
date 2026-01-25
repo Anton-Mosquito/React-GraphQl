@@ -1,36 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
-import tokenService from '../modules/auth/token.service.js';
+import tokenService, { TokenPayload } from '../modules/auth/token.service.js';
 import { ApiError } from '../utils/errors.js';
 
-export interface UserJwtPayload {
-  id: string;
-  email?: string;
-  isActivated?: boolean;
-}
+// Re-export TokenPayload for other modules
+export type { TokenPayload };
 
+// Extend Express Request with user property
 export interface AuthRequest extends Request {
-  user?: UserJwtPayload;
+  user?: TokenPayload;
 }
 
 export default function authMiddleware(
   req: AuthRequest,
   _res: Response,
   next: NextFunction,
-) {
+): void {
   const authorizationHeader = req.headers.authorization;
-  if (!authorizationHeader) {
-    return next(ApiError.Unauthorized('No authorization header'));
+
+  if (!authorizationHeader || typeof authorizationHeader !== 'string') {
+    next(ApiError.Unauthorized('No authorization header'));
+    return;
   }
 
   const parts = authorizationHeader.split(' ');
   if (parts.length !== 2 || parts[0] !== 'Bearer') {
-    return next(ApiError.Unauthorized('Malformed authorization header'));
+    next(ApiError.Unauthorized('Malformed authorization header'));
+    return;
   }
 
   const token = parts[1];
-  const userData = tokenService.validateAccessToken<UserJwtPayload>(token);
+  if (!token) {
+    next(ApiError.Unauthorized('No token provided'));
+    return;
+  }
+
+  const userData = tokenService.validateAccessToken(token);
   if (!userData) {
-    return next(ApiError.Unauthorized('Invalid or expired token'));
+    next(ApiError.Unauthorized('Invalid or expired token'));
+    return;
   }
 
   req.user = userData;

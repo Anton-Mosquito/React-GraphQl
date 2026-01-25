@@ -5,8 +5,8 @@ import { logger } from '../../utils/index.js';
 import { TMDBApiError } from '../../utils/index.js';
 import { createTMDBClient } from '../../utils/index.js';
 import {
-  TMDBMoviesResponse,
-  TMDBMovie,
+  TMDBMoviesResponseSchema,
+  TMDBMovieSchema,
   MovieFilterInput,
 } from '../../types/index.js';
 
@@ -22,8 +22,9 @@ export async function getPopular(
 ): Promise<Movies> {
   try {
     const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
-    const response = await tmdbClient.get<TMDBMoviesResponse>(
+    const response = await tmdbClient.getValidated(
       '/movie/popular',
+      TMDBMoviesResponseSchema,
       {
         params: {
           api_key: env.TMDB_API_KEY,
@@ -67,12 +68,16 @@ export async function getDetails(
 ): Promise<Movie> {
   try {
     const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
-    const response = await tmdbClient.get<TMDBMovie>(`/movie/${id}`, {
-      params: {
-        api_key: env.TMDB_API_KEY,
-        language,
+    const response = await tmdbClient.getValidated(
+      `/movie/${id}`,
+      TMDBMovieSchema,
+      {
+        params: {
+          api_key: env.TMDB_API_KEY,
+          language,
+        },
       },
-    });
+    );
 
     logger.debug('Fetched movie details', { id, language });
 
@@ -118,8 +123,9 @@ export async function discoverMovie(
     } = filter;
 
     const tmdbClient = createTMDBClient(env.TMDB_API_BASE_URL);
-    const response = await tmdbClient.get<TMDBMoviesResponse>(
+    const response = await tmdbClient.getValidated(
       '/discover/movie',
+      TMDBMoviesResponseSchema,
       {
         params: {
           api_key: env.TMDB_API_KEY,

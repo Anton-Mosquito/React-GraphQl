@@ -1,23 +1,24 @@
 import { Request, Response } from 'express';
-import type { UserJwtPayload } from '../middleware/auth.middleware.js';
+import type { TokenPayload } from '../modules/auth/token.service.js';
+import type { MoviesFilterInput, MovieIdsInput } from './graphql.schemas.js';
 
 export interface GraphQLContext {
   locale: string;
   req: Request;
   res: Response;
-  user?: UserJwtPayload | null;
+  user: TokenPayload | null;
 }
 
+// Re-export schemas and types
+export type { MoviesFilterInput, MovieIdsInput };
+export {
+  MoviesFilterInputSchema,
+  MovieIdsInputSchema,
+} from './graphql.schemas.js';
+
+// Legacy interface for backward compatibility (can be removed later)
 export interface MoviesFilterArgs {
-  filter?: {
-    page?: number;
-    sortBy?: string;
-    sortDirection?: 'desc' | 'asc';
-    includeAdult?: boolean;
-    year?: number;
-    primaryReleaseYear?: number;
-    genre?: number;
-  };
+  filter?: MoviesFilterInput;
 }
 
 export interface MoviesByIdsArgs {

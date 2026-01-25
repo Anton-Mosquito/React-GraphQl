@@ -8,6 +8,23 @@ interface ReleaseDateParams {
   format?: string;
 }
 
+export interface MovieDTO {
+  id: number;
+  title: string;
+  originalTitle: string;
+  releaseDate: string;
+  posterPath: string;
+  adult: boolean;
+  overview: string;
+  originalLanguage: string;
+  backdropPath: string;
+  popularity: number;
+  voteCount: number;
+  video: boolean;
+  voteAverage: number;
+  genres?: { id: number; name: string }[];
+}
+
 export class Movie {
   public readonly id: number;
   public readonly title: string;
@@ -66,13 +83,13 @@ export class Movie {
       logger.error('Error formatting release date', {
         movieId: this.id,
         rawDate: this.rawReleaseDate,
-        error,
+        error: error instanceof Error ? error.message : String(error),
       });
       return this.rawReleaseDate;
     }
   }
 
-  toJSON() {
+  toJSON(): MovieDTO {
     return {
       id: this.id,
       title: this.title,

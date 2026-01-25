@@ -23,6 +23,14 @@ import {
 import restRouter from './rest/routes.js';
 import getUserFromAuthHeader from './utils/auth.context.js';
 import WebSocketController from './modules/drawing/websocket.controller.js';
+import type { ExtendedWebSocket } from './modules/drawing/websocket.types.js';
+import mailService from './modules/auth/mail.service.js';
+import {
+  apiLimiter,
+  authLimiter,
+  graphqlLimiter,
+  activationLimiter,
+} from './middleware/rate-limit.js';
 
 // ES modules compatibility
 const __filename = fileURLToPath(import.meta.url);
@@ -43,11 +51,33 @@ async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
-  // attach express-ws for websocket routes
-  const wsInstance = expressWs(app);
-  const wsApp = wsInstance.app as unknown as express.Application;
+  // attach express-ws for websocket routes (bind to the same http server)
+  const wsInstance = expressWs(app, httpServer);
+  const wsApp = wsInstance.app as express.Application;
   const wss = wsInstance.getWss();
   const wsController = new WebSocketController(wss);
+
+  // WebSocket statistics endpoint (optional, for monitoring)
+  app.get('/ws-stats', (_req, res) => {
+    const stats = wsController.getStats();
+
+    res.json({
+      websocket: {
+        totalConnections: stats.totalConnections,
+        initializedConnections: stats.initializedConnections,
+        rooms: Array.from(stats.rooms.entries()).map(([id, count]) => ({
+          roomId: id,
+          users: count,
+        })),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // Periodic ping to keep connections alive (every 30 seconds)
+  setInterval(() => {
+    wsController.pingAll();
+  }, 30_000);
 
   // Create Apollo Server instance
   const server = new ApolloServer<GraphQLContext>({
@@ -69,7 +99,7 @@ async function startApolloServer() {
       });
       // Don't expose internal errors in production
       if (env.NODE_ENV === 'production') {
-        if (formattedError.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+        if (formattedError.extensions?.['code'] === 'INTERNAL_SERVER_ERROR') {
           return {
             message: 'An internal error occurred',
             extensions: {
@@ -98,7 +128,7 @@ async function startApolloServer() {
   const corsOptions = {
     origin:
       env.NODE_ENV === 'production'
-        ? process.env.ALLOWED_ORIGINS?.split(',') || []
+        ? process.env['ALLOWED_ORIGINS']?.split(',') || []
         : '*',
     credentials: true,
   };
@@ -107,6 +137,22 @@ async function startApolloServer() {
   app.use(cookieParser());
   app.use(cors<cors.CorsRequest>(corsOptions));
   app.use(express.json({ limit: '10mb' }));
+
+  // Apply rate limiting (production only)
+  if (env.NODE_ENV === 'production') {
+    // Protect sensitive auth endpoints explicitly
+    app.use('/api/registration', authLimiter);
+    app.use('/api/login', authLimiter);
+    app.use('/api/activate/:link', activationLimiter);
+
+    // General API + GraphQL limits
+    app.use('/api', apiLimiter);
+    app.use('/graphql', graphqlLimiter);
+
+    logger.info('Rate limiting enabled for production');
+  } else {
+    logger.info('Rate limiting disabled in development mode');
+  }
 
   // REST routes
   app.use('/api', restRouter);
@@ -117,8 +163,10 @@ async function startApolloServer() {
     express.json({ limit: '10mb' }),
     expressMiddleware(server, {
       context: async ({ req, res }: ContextParams): Promise<GraphQLContext> => {
-        const locale = (req.headers.locale as string) || 'en-US';
-        const user = getUserFromAuthHeader(req.headers as Record<string, any>);
+        const locale = (req.headers['locale'] as string | undefined) || 'en-US';
+        const user = getUserFromAuthHeader(
+          req.headers as Record<string, string | string[] | undefined>,
+        );
 
         return {
           locale,
@@ -136,10 +184,15 @@ async function startApolloServer() {
 
   // Health check endpoint
   app.get('/health', (_req, res) => {
+    const mailConfigured = mailService.isConfigured();
+
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
       environment: env.NODE_ENV,
+      services: {
+        mail: mailConfigured ? 'configured' : 'not_configured',
+      },
     });
   });
 
@@ -149,8 +202,8 @@ async function startApolloServer() {
   });
 
   // Wire WebSocket route (express-ws)
-  (wsApp as any).ws('/', (ws: WebSocket) => {
-    wsController.handleConnection(ws as any);
+  wsApp.ws?.('/', (ws: WebSocket) => {
+    wsController.handleConnection(ws as ExtendedWebSocket);
   });
 
   // Serve client for all other routes

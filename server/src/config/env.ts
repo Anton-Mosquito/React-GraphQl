@@ -1,50 +1,53 @@
-import { cleanEnv, str, num } from 'envalid';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { z } from 'zod';
 
-// ES modules compatibility
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+dotenv.config();
 
-// Load .env from monorepo root (one level up from server/)
-dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+const envSchema = z.object({
+  // Server
+  PORT: z.coerce.number().int().positive().default(5001),
+  NODE_ENV: z
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 
-export type Env = {
-  PORT: number;
-  NODE_ENV: string;
-  DATABASE_URL: string;
-  CLIENT_URL: string;
-  API_URL: string;
-  TMDB_API_KEY: string;
-  TMDB_API_BASE_URL: string;
-  TMDB_IMAGE_BASE_PATH: string;
-  SMTP_SERVICE: string;
-  GOOGLE_CLIENT: string;
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
-  GOOGLE_REFRESH_TOKEN: string;
-  JWT_ACCESS_SECRET: string;
-  JWT_REFRESH_SECRET: string;
-};
+  // Database
+  DATABASE_URL: z.string().url(),
 
-const env = cleanEnv(process.env, {
-  PORT: num({ default: 5001 }),
-  NODE_ENV: str({ default: 'development' }),
-  DATABASE_URL: str(),
-  CLIENT_URL: str(),
-  API_URL: str(),
-  TMDB_API_KEY: str(),
-  TMDB_API_BASE_URL: str(),
-  TMDB_IMAGE_BASE_PATH: str(),
-  SMTP_SERVICE: str(),
-  GOOGLE_CLIENT: str(),
-  GOOGLE_CLIENT_ID: str(),
-  GOOGLE_CLIENT_SECRET: str(),
-  GOOGLE_REFRESH_TOKEN: str(),
-  JWT_ACCESS_SECRET: str(),
-  JWT_REFRESH_SECRET: str(),
-}) as unknown as Env;
+  // URLs
+  CLIENT_URL: z.string().url(),
+  API_URL: z.string().url(),
 
-export { env };
+  // TMDB API
+  TMDB_API_KEY: z.string().min(1),
+  TMDB_API_BASE_URL: z.string().url(),
+  TMDB_IMAGE_BASE_PATH: z.string().url(),
+
+  // Email SMTP
+  SMTP_SERVICE: z.string().min(1),
+
+  // Google OAuth for email
+  GOOGLE_CLIENT: z.string().min(1),
+  GOOGLE_CLIENT_ID: z.string().min(1),
+  GOOGLE_CLIENT_SECRET: z.string().min(1),
+  GOOGLE_REFRESH_TOKEN: z.string().min(1),
+
+  // JWT Secrets
+  JWT_ACCESS_SECRET: z
+    .string()
+    .min(32, 'JWT Access Secret must be at least 32 characters'),
+  JWT_REFRESH_SECRET: z
+    .string()
+    .min(32, 'JWT Refresh Secret must be at least 32 characters'),
+
+  // JWT Expiration (optional with defaults)
+  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
+});
+
+export const env = envSchema.parse(process.env);
+
+// Export the type for use in other files
+export type Env = z.infer<typeof envSchema>;
+
+// Default export for backwards compatibility
 export default env;

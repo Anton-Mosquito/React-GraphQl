@@ -1,37 +1,19 @@
-export interface TMDBGenre {
-  id: number;
-  name: string;
-}
+// Re-export types and schemas from tmdb.schemas.ts
+export type {
+  TMDBGenre,
+  TMDBMovie,
+  TMDBMoviesResponse,
+  TMDBGenresResponse,
+} from './tmdb.schemas.js';
 
-export interface TMDBMovie {
-  id: number;
-  title: string;
-  original_title: string;
-  release_date: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
-  adult: boolean;
-  overview: string;
-  original_language: string;
-  popularity: number;
-  vote_count: number;
-  video: boolean;
-  vote_average: number;
-  genre_ids?: number[];
-  genres?: TMDBGenre[];
-}
+export {
+  TMDBGenreSchema,
+  TMDBMovieSchema,
+  TMDBMoviesResponseSchema,
+  TMDBGenresResponseSchema,
+} from './tmdb.schemas.js';
 
-export interface TMDBMoviesResponse {
-  page: number;
-  total_results: number;
-  total_pages: number;
-  results: TMDBMovie[];
-}
-
-export interface TMDBGenresResponse {
-  genres: TMDBGenre[];
-}
-
+// GraphQL input types (these stay here as they're not from TMDB)
 export interface MovieFilterInput {
   page?: number;
   sortBy?: string;
