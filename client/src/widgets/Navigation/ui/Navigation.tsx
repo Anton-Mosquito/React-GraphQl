@@ -18,7 +18,8 @@ import type { MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { LangSwitcher } from '@/shared/ui/LangSwitcher/LangSwitcher';
+import { LangSwitcher } from '@/shared/ui/LangSwitcher/ui/LangSwitcher';
+import { ThemeSwitcher } from '@/shared/ui/ThemeSwitcher/ui/ThemeSwitcher';
 
 export const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
@@ -75,6 +76,7 @@ export const Navigation = () => {
             </Typography>
           </Link>
           <LangSwitcher />
+          <ThemeSwitcher />
           <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
             <Button
               component={RouterLink}

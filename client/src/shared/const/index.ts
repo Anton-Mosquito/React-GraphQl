@@ -16,5 +16,3 @@ export const LOCALES = {
   ENGLISH: 'en-US',
   UKRANIAN: 'uk-UA',
 } as const;
-
-export const STORAGE_KEY = 'app_state_v1';

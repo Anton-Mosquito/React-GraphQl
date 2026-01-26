@@ -7,6 +7,7 @@ import { ApolloProvider } from './app/providers/ApolloProvider';
 import { ErrorBoundary } from './app/providers/ErrorBoundary';
 import './shared/config/i18n/i18';
 import { StoreProvider } from './app/providers/StoreProvider';
+import { ThemeProvider } from './app/providers/ThemeProvider';
 
 const rootEl = document.getElementById('root');
 
@@ -18,9 +19,11 @@ root.render(
     <BrowserRouter>
       <ErrorBoundary>
         <StoreProvider>
-          <ApolloProvider>
-            <App />
-          </ApolloProvider>
+          <ThemeProvider>
+            <ApolloProvider>
+              <App />
+            </ApolloProvider>
+          </ThemeProvider>
         </StoreProvider>
       </ErrorBoundary>
     </BrowserRouter>
