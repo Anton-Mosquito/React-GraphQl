@@ -19,7 +19,7 @@ interface FiltersProps {
   initialValues?: any;
 }
 
-export const Filters: React.FC<FiltersProps> = ({ onSubmit, initialValues }) => {
+export const Filters = ({ onSubmit, initialValues }: FiltersProps) => {
   const { loading, error, data } = useQuery(GENRES_QUERY as any);
 
   if (loading) {

@@ -4,7 +4,7 @@ import React from 'react';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
-export const AdultField: React.FC = () => {
+export const AdultField = () => {
   const intl = useIntl();
   const label = intl.formatMessage({ id: 'filters.include_adult' });
 

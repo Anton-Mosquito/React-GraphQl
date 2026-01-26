@@ -9,7 +9,7 @@ import { useIntl, FormattedMessage } from 'react-intl';
 
 import { SORT_DIRECTION } from '../../../../const';
 
-export const SortDirectionField: React.FC = () => {
+export const SortDirectionField = () => {
   const intl = useIntl();
   const placeholder = intl.formatMessage({ id: 'filters.sort_direction' });
 

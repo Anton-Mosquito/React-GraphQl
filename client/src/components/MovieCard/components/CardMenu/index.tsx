@@ -8,7 +8,7 @@ interface CardMenuProps {
   children?: React.ReactNode;
 }
 
-const CardMenu: React.FC<CardMenuProps> = ({ children }) => {
+const CardMenu = ({ children }: CardMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
 

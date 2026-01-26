@@ -20,9 +20,9 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { LOCALES } from '../../const';
 import { AppContext } from '../../providers/appContext';
-import translate from '../../utils/translate';
+import translate from '@/shared/utils/translate';
 
-const Navigation: React.FC = () => {
+const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const { state, dispatch } = useContext(AppContext) as any;
 

@@ -1,4 +1,3 @@
-import { AppLink } from 'shared/ui/AppLink/AppLink';
 import MenuIcon from '@mui/icons-material/Menu';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { Link } from '@mui/material';
@@ -21,7 +20,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { LOCALES } from '../../../const';
 import { AppContext } from '../../../providers/appContext';
-import translate from '../../../utils/translate';
+import translate from '@/shared/utils/translate';
 
 export const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);

@@ -11,7 +11,7 @@ interface SelectedMoviesFormProps {
   onSubmit?: (values: { listName?: string }) => void | Promise<void>;
 }
 
-const SelectedMoviesForm: React.FC<SelectedMoviesFormProps> = ({ onSubmit }) => {
+const SelectedMoviesForm = ({ onSubmit }: SelectedMoviesFormProps) => {
   const intl = useIntl();
   const placeholder = intl.formatMessage({ id: 'put_the_list_name' });
 

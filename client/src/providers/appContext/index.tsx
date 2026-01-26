@@ -3,7 +3,7 @@ import React, { createContext, useReducer } from 'react';
 import type { AppState } from './defaultContext';
 import { useDefaultContext } from './defaultContext';
 import { STORAGE_KEY } from '../../const';
-import { saveToStorage } from '../../utils/localStorage';
+import { saveToStorage } from '../../shared/utils/localStorage';
 
 export type AppAction = { type: 'setLocale'; locale: string } | { type: string };
 
@@ -28,7 +28,7 @@ const reducer = (state: AppState, action: AppAction): AppState => {
   }
 };
 
-const AppContextProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
+const AppContextProvider = ({ children }: React.PropsWithChildren) => {
   const defaultContext = useDefaultContext();
   const [state, dispatch] = useReducer(reducer, defaultContext);
   const value: AppContextValue = { state, dispatch };

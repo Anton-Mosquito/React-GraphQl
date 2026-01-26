@@ -3,7 +3,7 @@ import React from 'react';
 import { Field } from 'react-final-form';
 import { useIntl } from 'react-intl';
 
-export const ReleaseYearField: React.FC = () => {
+export const ReleaseYearField = () => {
   const intl = useIntl();
   const label = intl.formatMessage({ id: 'filters.release_year' });
 

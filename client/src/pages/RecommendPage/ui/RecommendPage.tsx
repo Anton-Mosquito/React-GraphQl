@@ -4,10 +4,10 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { MOVIES_BY_IDS_QUERY } from '../queries';
 import { MovieCard } from '../../../components';
+import { MOVIES_BY_IDS_QUERY } from '../queries';
 
-const Recommend: React.FC = () => {
+const Recommend = () => {
   const [searchParams] = useSearchParams();
 
   const idsParam = searchParams.get('ids') || '';

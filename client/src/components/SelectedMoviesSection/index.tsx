@@ -55,10 +55,10 @@ interface SelectedMoviesSectionProps {
   deleteMovie?: (movie: Movie) => void;
 }
 
-const SelectedMoviesSection: React.FC<SelectedMoviesSectionProps> = ({
+const SelectedMoviesSection = ({
   selectedMovies,
   deleteMovie,
-}) => {
+}: SelectedMoviesSectionProps) => {
   const [listName, setListName] = useState('');
   const [link, setLink] = useState('');
   const { state } = useContext(AppContext) as any;

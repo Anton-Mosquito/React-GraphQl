@@ -22,20 +22,7 @@
     "types": ["node", "jest", "react", "react-dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "pages/*": ["./src/pages/*"],
-      "components/*": ["./src/components/*"],
-      "hooks/*": ["./src/hooks/*"],
-      "services/*": ["./src/services/*"],
-      "types/*": ["./src/types/*"],
-      "utils/*": ["./src/utils/*"],
-      "providers/*": ["./src/providers/*"],
-      "shared/*": ["./src/shared/*"],
-      "assets/*": ["./src/assets/*"],
-      "app/*": ["./src/app/*"],
-      "messages/*": ["./src/messages/*"],
-      "http/*": ["./src/http/*"],
-      "widgets/*": ["./src/widgets/*"]  
+      "@/*": ["./src/*"]
     },
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "env.d.ts"],

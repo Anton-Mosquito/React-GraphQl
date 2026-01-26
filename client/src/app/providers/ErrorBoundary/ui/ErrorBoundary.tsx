@@ -1,45 +1,43 @@
-// import React, { type ReactNode, type ErrorInfo, Suspense } from 'react';
-// import { PageError } from '@/widgets/PageError';
+import React, { type ReactNode, type ErrorInfo, Suspense } from 'react';
 
-// interface ErrorBoundaryProps {
-//   children: ReactNode;
-// }
+import { ErrorPage } from '@/pages/ErrorPage';
+interface ErrorBoundaryProps {
+  children: ReactNode;
+}
 
-// interface ErrorBoundaryState {
-//   hasError: boolean;
-// }
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
 
-// class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-//   constructor(props: ErrorBoundaryProps) {
-//     super(props);
-//     this.state = { hasError: false };
-//   }
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
 
-//   // eslint-disable-next-line n/handle-callback-err
-//   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-//     // Update state so the next render will show the fallback UI.
-//     return { hasError: true };
-//   }
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
 
-//   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-//     // You can also log the error to an error reporting service
-//     console.log(error, errorInfo);
-//   }
+  componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+  }
 
-//   render(): React.ReactNode {
-//     const { hasError } = this.state;
-//     const { children } = this.props;
+  render(): React.ReactNode {
+    const { hasError } = this.state;
+    const { children } = this.props;
 
-//     if (hasError) {
-//       return (
-//         <Suspense>
-//           <PageError />
-//         </Suspense>
-//       );
-//     }
+    if (hasError) {
+      return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <ErrorPage />
+        </Suspense>
+      );
+    }
 
-//     return children;
-//   }
-// }
+    return children;
+  }
+}
 
-// export default ErrorBoundary;
+export default ErrorBoundary;

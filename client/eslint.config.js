@@ -38,7 +38,7 @@ export default [
     settings: {
       react: { version: 'detect' },
       'import/resolver': {
-        typescript: { project: './tsconfig.json' },
+        typescript: true,
       },
     },
     rules: {
@@ -68,11 +68,6 @@ export default [
       'unused-imports/no-unused-imports': 'error',
 
       'no-console': ['warn', { allow: ['warn', 'error'] }],
-    },
-    globals: {
-      __IS_DEV__: true,
-      __API__: true,
-      __PROJECT__: true,
     },
   },
 ];

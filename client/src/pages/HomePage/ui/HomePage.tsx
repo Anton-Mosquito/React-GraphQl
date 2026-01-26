@@ -4,11 +4,11 @@ import Grid from '@mui/material/Grid';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
 
-import { MOVIES_QUERY } from '../queries';
 import { MovieCard, SelectedMoviesSection } from '../../../components';
 import { Filters } from '../../../components/Filters';
 import { useFilters } from '../../../hooks/useFilters';
 import { useMovies } from '../../../hooks/useMovies';
+import { MOVIES_QUERY } from '../queries';
 
 const Home = () => {
   const { filter, setPage, setFilter } = useFilters();

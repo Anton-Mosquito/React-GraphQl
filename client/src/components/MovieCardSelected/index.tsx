@@ -21,7 +21,7 @@ interface MovieCardSelectedProps {
   onCardDelete?: (movie: HookMovie) => void;
 }
 
-const MovieCardSelected: React.FC<MovieCardSelectedProps> = ({ movie, onCardDelete }) => {
+const MovieCardSelected = ({ movie, onCardDelete }: MovieCardSelectedProps) => {
   return (
     <Card sx={{ display: 'flex', minHeight: '164px' }}>
       <CardMedia component="img" sx={{ width: 100 }} image={movie.image} alt={movie.title} />

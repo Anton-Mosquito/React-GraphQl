@@ -8,7 +8,7 @@ import { useIntl, FormattedMessage } from 'react-intl';
 
 import { SORT_OPTIONS } from '../../../../const';
 
-export const SortField: React.FC = () => {
+export const SortField = () => {
   const intl = useIntl();
   const placeholder = intl.formatMessage({ id: 'filters.sort_by' });
 

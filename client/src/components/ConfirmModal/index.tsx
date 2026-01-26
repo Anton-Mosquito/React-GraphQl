@@ -34,12 +34,12 @@ interface ConfirmModalProps {
   onClose?: () => void;
 }
 
-const ConfirmModal: React.FC<ConfirmModalProps> = ({
+const ConfirmModal = ({
   open = false,
   url = '',
   title = '',
   onClose,
-}) => {
+}: ConfirmModalProps) => {
   const [openAlert, setOpenAlert] = useState(false);
 
   useEffect(() => {

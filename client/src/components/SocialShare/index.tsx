@@ -9,7 +9,7 @@ interface SocialShareProps {
   title?: string;
 }
 
-const SocialShare: React.FC<SocialShareProps> = ({ url = '', title = '' }) => (
+const SocialShare = ({ url = '', title = '' }: SocialShareProps) => (
   <Stack direction="row" spacing={1}>
     <FacebookShareButton url={url}>
       <FacebookIcon round size={SOCIAL_BUTTON_SIZE} />

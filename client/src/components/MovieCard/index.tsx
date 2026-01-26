@@ -37,7 +37,7 @@ interface MovieCardProps {
   isPreviewMode?: boolean;
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ movie, onCardSelect, isPreviewMode = false }) => {
+const MovieCard = ({ movie, onCardSelect, isPreviewMode = false }: MovieCardProps) => {
   return (
     <Card sx={{ maxWidth: 250, position: 'relative' }}>
       {!isPreviewMode && (

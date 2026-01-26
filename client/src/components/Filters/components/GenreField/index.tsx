@@ -10,7 +10,7 @@ interface GenreFieldProps {
   data?: any;
 }
 
-export const GenreField: React.FC<GenreFieldProps> = ({ data }) => {
+export const GenreField = ({ data }: GenreFieldProps) => {
   const intl = useIntl();
   const placeholder = intl.formatMessage({ id: 'filters.genre' });
 
