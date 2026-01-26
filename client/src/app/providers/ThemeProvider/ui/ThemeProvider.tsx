@@ -1,3 +1,4 @@
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { type ReactNode, useMemo, useState, useEffect } from 'react';
 
 import { LOCAL_STORAGE_THEME_KEY } from '@/shared/const/localStorage';
@@ -9,10 +10,14 @@ interface ThemeProviderProps {
   initialTheme?: Theme;
 }
 
-const fallbackTheme = (localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as Theme) ?? Theme.LIGHT;
-
 const ThemeProvider = ({ children, initialTheme }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<Theme>(initialTheme ?? fallbackTheme ?? Theme.LIGHT);
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem(LOCAL_STORAGE_THEME_KEY) as Theme;
+    if (savedTheme) return savedTheme;
+    if (initialTheme) return initialTheme;
+    return prefersDarkMode ? Theme.DARK : Theme.LIGHT;
+  });
   const defaultProps = useMemo(() => ({ theme, setTheme }), [theme]);
 
   useEffect(() => {
