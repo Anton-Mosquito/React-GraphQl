@@ -1,4 +1,4 @@
-import { TMDBGenre } from '../../../types/index.js';
+import { TMDBGenre } from '#schema/index.js';
 
 export class Genre {
   public readonly id: number;

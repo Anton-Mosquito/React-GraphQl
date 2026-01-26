@@ -1,12 +1,9 @@
 import { format, parseISO } from 'date-fns';
-import { TMDBMovie } from '../../../types/index.js';
-import { config } from '../../../config/index.js';
-import { logger } from '../../../utils/index.js';
-import { Genre } from './Genre.js';
-
-interface ReleaseDateParams {
-  format?: string;
-}
+import { ReleaseDateParams, MovieDTO } from '#types/index.js';
+import { TMDBMovie, TMDBGenre } from '#schema/index.js';
+import { env } from '#config/env.js';
+import { logger } from '#utils/index.js';
+import { Genre } from '#modules/index.js';
 
 export class Movie {
   public readonly id: number;
@@ -39,15 +36,15 @@ export class Movie {
     this.rawReleaseDate = movie.release_date;
 
     this.posterPath = movie.poster_path
-      ? `${config.tmdb.imageBasePath}${movie.poster_path}`
+      ? `${env.TMDB_IMAGE_BASE_PATH}${movie.poster_path}`
       : '';
 
     this.backdropPath = movie.backdrop_path
-      ? `${config.tmdb.imageBasePath}${movie.backdrop_path}`
+      ? `${env.TMDB_IMAGE_BASE_PATH}${movie.backdrop_path}`
       : '';
 
     if (movie.genres && movie.genres.length > 0) {
-      this.genres = movie.genres.map((g) => new Genre(g));
+      this.genres = movie.genres.map((g: TMDBGenre) => new Genre(g));
     }
   }
 
@@ -66,13 +63,13 @@ export class Movie {
       logger.error('Error formatting release date', {
         movieId: this.id,
         rawDate: this.rawReleaseDate,
-        error,
+        error: error instanceof Error ? error.message : String(error),
       });
       return this.rawReleaseDate;
     }
   }
 
-  toJSON() {
+  toJSON(): MovieDTO {
     return {
       id: this.id,
       title: this.title,

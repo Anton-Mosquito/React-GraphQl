@@ -1,10 +1,8 @@
 import { GraphQLResolveInfo } from 'graphql';
 import { GraphQLContext } from './graphql.types.js';
-import { Movie } from '../modules/movies/entities/index.js';
-import { Movies } from '../modules/movies/entities/index.js';
-import { Genre } from '../modules/movies/entities/index.js';
+import { Movie, Movies, Genre } from '#modules/index.js';
+import { MoviesFilterInput } from '#schema/index.js';
 
-// Parent types for resolvers
 export type MovieParent = Movie;
 export type MoviesParent = Movies;
 
@@ -12,23 +10,23 @@ export type MoviesParent = Movies;
 export type QueryResolvers = {
   movies: (
     parent: unknown,
-    args: { filter?: any },
+    args: { filter?: MoviesFilterInput },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Movies>;
 
   moviesByIds: (
     parent: unknown,
     args: { ids: number[] },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Movie[]>;
 
   genres: (
     parent: unknown,
     args: Record<string, never>,
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => Promise<Genre[]>;
 };
 
@@ -38,7 +36,7 @@ export type MovieFieldResolvers = {
     parent: MovieParent,
     args: { format?: string },
     context: GraphQLContext,
-    info: GraphQLResolveInfo
+    info: GraphQLResolveInfo,
   ) => string;
 };
 

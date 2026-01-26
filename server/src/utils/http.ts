@@ -1,5 +1,5 @@
-import { logger } from "./logger.js";
-import { TMDBApiError } from "./errors.js";
+import { z } from 'zod';
+import { TMDBApiError, logger } from '#utils/index.js';
 
 interface FetchOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined>;
@@ -15,7 +15,7 @@ interface FetchResponse<T> {
 function buildSearchParams(
   params?: Record<string, string | number | boolean | undefined>,
 ): string {
-  if (!params) return "";
+  if (!params) return '';
 
   const searchParams = new URLSearchParams();
 
@@ -26,7 +26,7 @@ function buildSearchParams(
   });
 
   const query = searchParams.toString();
-  return query ? `?${query}` : "";
+  return query ? `?${query}` : '';
 }
 
 async function fetchWithTimeout(
@@ -53,27 +53,35 @@ export class HttpClient {
   private defaultHeaders: Record<string, string>;
 
   constructor(baseURL: string, defaultHeaders: Record<string, string> = {}) {
-    this.baseURL = baseURL.endsWith("/") ? baseURL.slice(0, -1) : baseURL;
+    this.baseURL = baseURL.endsWith('/') ? baseURL.slice(0, -1) : baseURL;
     this.defaultHeaders = {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
       ...defaultHeaders,
     };
   }
 
-  async get<T>(
+  /**
+   * GET request with Zod schema validation
+   * @param endpoint - API endpoint
+   * @param schema - Zod schema for response validation
+   * @param options - Fetch options
+   * @returns Validated response data
+   */
+  async getValidated<T extends z.ZodType>(
     endpoint: string,
+    schema: T,
     options: FetchOptions = {},
-  ): Promise<FetchResponse<T>> {
+  ): Promise<FetchResponse<z.infer<T>>> {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
-    logger.debug("HTTP GET request", { url, params });
+    logger.debug('HTTP GET request (validated)', { url, params });
 
     try {
       const response = await fetchWithTimeout(
         url,
         {
-          method: "GET",
+          method: 'GET',
           headers: {
             ...this.defaultHeaders,
             ...headers,
@@ -85,7 +93,7 @@ export class HttpClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error("HTTP request failed", {
+        logger.error('HTTP request failed', {
           url,
           status: response.status,
           statusText: response.statusText,
@@ -98,48 +106,80 @@ export class HttpClient {
         );
       }
 
-      const data = await response.json();
+      const rawData = await response.json();
 
-      return {
-        data: data as T,
-        status: response.status,
-        statusText: response.statusText,
-      };
+      // Validate response with Zod schema
+      try {
+        const validatedData = schema.parse(rawData);
+
+        return {
+          data: validatedData,
+          status: response.status,
+          statusText: response.statusText,
+        };
+      } catch (validationError) {
+        logger.error('Response validation failed', {
+          url,
+          error:
+            validationError instanceof Error
+              ? validationError.message
+              : 'Unknown validation error',
+        });
+        throw new TMDBApiError(
+          'Invalid response format from TMDB API',
+          502,
+          validationError,
+        );
+      }
     } catch (error) {
       if (error instanceof TMDBApiError) {
         throw error;
       }
 
-      if (error instanceof Error && error.name === "AbortError") {
-        logger.error("HTTP request timeout", { url, timeout });
-        throw new TMDBApiError("Request timeout", 408, error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        logger.error('HTTP request timeout', { url, timeout });
+        throw new TMDBApiError('Request timeout', 408, error);
       }
 
       if (error instanceof TypeError) {
-        logger.error("Network error", { url, error: error.message });
-        throw new TMDBApiError("Network error", undefined, error);
+        logger.error('Network error', { url, error: error.message });
+        throw new TMDBApiError('Network error', undefined, error);
       }
 
-      logger.error("Unexpected HTTP error", { url, error });
-      throw new TMDBApiError("Unexpected error occurred", undefined, error);
+      logger.error('Unexpected HTTP error', { url, error });
+      throw new TMDBApiError('Unexpected error occurred', undefined, error);
     }
   }
 
   async post<T, D = unknown>(
     endpoint: string,
+    data: D | undefined,
+    options: FetchOptions,
+    schema: z.ZodType<T>,
+  ): Promise<FetchResponse<T>>;
+
+  async post(
+    endpoint: string,
+    data?: unknown,
+    options?: FetchOptions,
+  ): Promise<FetchResponse<unknown>>;
+
+  async post<T = unknown, D = unknown>(
+    endpoint: string,
     data?: D,
     options: FetchOptions = {},
-  ): Promise<FetchResponse<T>> {
+    schema?: z.ZodType<T>,
+  ): Promise<FetchResponse<T> | FetchResponse<unknown>> {
     const { params, timeout, headers, ...fetchOptions } = options;
     const url = `${this.baseURL}${endpoint}${buildSearchParams(params)}`;
 
-    logger.debug("HTTP POST request", { url, data });
+    logger.debug('HTTP POST request', { url, data });
 
     try {
       const response = await fetchWithTimeout(
         url,
         {
-          method: "POST",
+          method: 'POST',
           headers: {
             ...this.defaultHeaders,
             ...headers,
@@ -152,7 +192,7 @@ export class HttpClient {
 
       if (!response.ok) {
         const errorText = await response.text();
-        logger.error("HTTP POST request failed", {
+        logger.error('HTTP POST request failed', {
           url,
           status: response.status,
           statusText: response.statusText,
@@ -167,24 +207,52 @@ export class HttpClient {
 
       const responseData = await response.json();
 
+      if (schema) {
+        try {
+          const validated = schema.parse(responseData);
+          return {
+            data: validated,
+            status: response.status,
+            statusText: response.statusText,
+          } as FetchResponse<T>;
+        } catch (validationError) {
+          logger.error('Response validation failed (POST)', {
+            url,
+            error:
+              validationError instanceof Error
+                ? validationError.message
+                : String(validationError),
+          });
+          throw new TMDBApiError(
+            'Invalid response format from TMDB API',
+            502,
+            validationError,
+          );
+        }
+      }
+
+      // No schema provided — return unknown payload
       return {
-        data: responseData as T,
+        data: responseData as unknown,
         status: response.status,
         statusText: response.statusText,
       };
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof TMDBApiError) {
         throw error;
       }
 
-      logger.error("POST request error", { url, error });
-      throw new TMDBApiError("Request failed", undefined, error);
+      logger.error('POST request error', {
+        url,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw new TMDBApiError('Request failed', undefined, error as unknown);
     }
   }
 }
 
 export function createTMDBClient(baseURL: string): HttpClient {
   return new HttpClient(baseURL, {
-    Accept: "application/json",
+    Accept: 'application/json',
   });
 }

@@ -3,23 +3,50 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "lib": ["ES2022", "DOM"],
+    "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src",
+    "baseUrl": "./src",
+    "paths": {
+      "#config/*": ["./config/*"],
+      "#modules/*": ["./modules/*"],
+      "#types/*": ["./types/*"],
+      "#utils/*": ["./utils/*"],
+      "#middleware/*": ["./middleware/*"],
+      "#schema/*": ["./schema/*"]
+    },
+
+    // Strict Type-Checking Options
     "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+
+    // Additional Checks
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "allowSyntheticDefaultImports": true,
-    "allowJs": false
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    // Module Resolution
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+
+    // Emit
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "importHelpers": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"],

@@ -1,31 +1,36 @@
-import fs from "fs";
-import path from "path";
-import express from "express";
-import http from "http";
-import { ApolloServer } from "@apollo/server";
-import { expressMiddleware } from "@as-integrations/express5";
-import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
-import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
-import cors from "cors";
-import { fileURLToPath } from "url";
-import resolvers from "./resolvers/index.js";
-import { config } from "./config/index.js";
-import { logger } from "./utils/index.js";
-import { GraphQLContext } from "./types/index.js";
+import { env } from '#config/env.js';
 import {
+  apiLimiter,
   errorHandler,
-  securityHeaders,
+  graphqlLimiter,
   requestLogger,
-} from "./middleware/index.js";
+  securityHeaders,
+} from '#middleware/index.js';
+import { MailService, websocketController } from '#modules/index.js';
+import { ExtendedWebSocket, GraphQLContext } from '#types/index.js';
+import { getUserFromAuthHeader, logger } from '#utils/index.js';
+import { ApolloServer } from '@apollo/server';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
+import { expressMiddleware } from '@as-integrations/express5';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import express from 'express';
+import expressWs from 'express-ws';
+import fs from 'fs';
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { WebSocket } from 'ws';
+import resolvers from './resolvers/index.js';
+import restRouter from './rest/routes.js';
 
-// ES modules compatibility
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load GraphQL schema
 const typeDefs = fs.readFileSync(
-  path.join(__dirname, "schema.graphql"),
-  "utf8",
+  path.join(__dirname, 'schema.graphql'),
+  'utf8',
 );
 
 interface ContextParams {
@@ -36,6 +41,32 @@ interface ContextParams {
 async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
+
+  const wsInstance = expressWs(app, httpServer);
+  const wsApp = wsInstance.app as express.Application;
+  const wss = wsInstance.getWss();
+  const wsController = new websocketController(wss);
+
+  app.get('/ws-stats', (_req, res) => {
+    const stats = wsController.getStats();
+
+    res.json({
+      websocket: {
+        totalConnections: stats.totalConnections,
+        initializedConnections: stats.initializedConnections,
+        rooms: Array.from(stats.rooms.entries()).map(([id, count]) => ({
+          roomId: id,
+          users: count,
+        })),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  // Periodic ping to keep connections alive (every 30 seconds)
+  setInterval(() => {
+    wsController.pingAll();
+  }, 30_000);
 
   // Create Apollo Server instance
   const server = new ApolloServer<GraphQLContext>({
@@ -50,18 +81,18 @@ async function startApolloServer() {
     ],
     formatError: (formattedError) => {
       // Log errors
-      logger.error("GraphQL Error", {
+      logger.error('GraphQL Error', {
         message: formattedError.message,
         path: formattedError.path,
         extensions: formattedError.extensions,
       });
       // Don't expose internal errors in production
-      if (config.nodeEnv === "production") {
-        if (formattedError.extensions?.code === "INTERNAL_SERVER_ERROR") {
+      if (env.NODE_ENV === 'production') {
+        if (formattedError.extensions?.['code'] === 'INTERNAL_SERVER_ERROR') {
           return {
-            message: "An internal error occurred",
+            message: 'An internal error occurred',
             extensions: {
-              code: "INTERNAL_SERVER_ERROR",
+              code: 'INTERNAL_SERVER_ERROR',
             },
           };
         }
@@ -78,58 +109,80 @@ async function startApolloServer() {
   app.use(securityHeaders);
 
   // Request logging in development
-  if (config.nodeEnv === "development") {
+  if (env.NODE_ENV === 'development') {
     app.use(requestLogger);
   }
 
   // CORS configuration
   const corsOptions = {
     origin:
-      config.nodeEnv === "production"
-        ? process.env.ALLOWED_ORIGINS?.split(",") || []
-        : "*",
+      env.NODE_ENV === 'production'
+        ? env.ALLOWED_ORIGINS?.split(',') || []
+        : '*',
     credentials: true,
   };
 
-  // GraphQL endpoint
+  // Standard middleware
+  app.use(cookieParser());
+  app.use(cors<cors.CorsRequest>(corsOptions));
+  app.use(express.json({ limit: '10mb' }));
+
+  // REST routes (rate-limited)
+  app.use('/api', apiLimiter, restRouter);
+
+  // GraphQL endpoint with auth-aware context
   app.use(
-    "/graphql",
-    cors<cors.CorsRequest>(corsOptions),
-    express.json({ limit: "10mb" }),
+    '/graphql',
+    express.json({ limit: '10mb' }),
+    graphqlLimiter,
     expressMiddleware(server, {
       context: async ({ req, res }: ContextParams): Promise<GraphQLContext> => {
-        const locale = (req.headers.locale as string) || "en-US";
+        const locale = (req.headers['locale'] as string | undefined) || 'en-US';
+        const user = getUserFromAuthHeader(
+          req.headers as Record<string, string | string[] | undefined>,
+        );
 
         return {
           locale,
           req,
           res,
+          user,
         };
       },
     }),
   );
 
   // Static files for client
-  app.use(express.static(path.join(__dirname, "../../client/build")));
-  app.use(express.static("public"));
+  app.use(express.static(path.join(__dirname, '../../client/build')));
+  app.use(express.static('public'));
 
   // Health check endpoint
-  app.get("/health", (_req, res) => {
+  app.get('/health', (_req, res) => {
+    const mailConfigured = MailService.isConfigured();
+
     res.json({
-      status: "ok",
+      status: 'ok',
       timestamp: new Date().toISOString(),
-      environment: config.nodeEnv,
+      environment: env.NODE_ENV,
+      services: {
+        mail: mailConfigured ? 'configured' : 'not_configured',
+      },
     });
   });
 
-  // REST test endpoint (optional, can be removed)
-  app.get("/rest", (_req, res) => {
-    res.json({ data: "rest works" });
+  // Simple REST test endpoint
+  app.get('/rest', (_req, res) => {
+    res.json({ data: 'rest works' });
+  });
+
+  // Wire WebSocket route (express-ws)
+  wsApp.ws?.('/', (ws: WebSocket) => {
+    wsController.handleConnection(ws as ExtendedWebSocket);
   });
 
   // Serve client for all other routes
   app.get(/.*/, (_req, res) => {
-    res.sendFile(path.join(__dirname, "../../client/build/index.html"));
+    res.sendFile(path.join(__dirname, '../../client/build/index.html'));
   });
 
   // Error handling middleware (must be last)
@@ -137,17 +190,17 @@ async function startApolloServer() {
 
   // Start server
   await new Promise<void>((resolve) =>
-    httpServer.listen({ port: config.port }, resolve),
+    httpServer.listen({ port: env.PORT }, resolve),
   );
 
-  logger.info(`🚀 Server ready at http://localhost:${config.port}/graphql`);
-  logger.info(`📊 GraphQL Playground: http://localhost:${config.port}/graphql`);
-  logger.info(`🏥 Health check: http://localhost:${config.port}/health`);
-  logger.info(`🌍 Environment: ${config.nodeEnv}`);
+  logger.info(`🚀 Server ready at http://localhost:${env.PORT}/graphql`);
+  logger.info(`📊 GraphQL Playground: http://localhost:${env.PORT}/graphql`);
+  logger.info(`🏥 Health check: http://localhost:${env.PORT}/health`);
+  logger.info(`🌍 Environment: ${env.NODE_ENV}`);
 }
 
 // Start server and handle errors
 startApolloServer().catch((error) => {
-  logger.error("Failed to start server", { error });
+  logger.error('Failed to start server', { error });
   process.exit(1);
 });
