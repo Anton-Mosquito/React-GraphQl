@@ -3,10 +3,10 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type { ReactElement } from 'react';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 export const ErrorPage = (): ReactElement => {
-  const intl = useIntl();
+  const { t } = useTranslation();
 
   const reloadPage = (): void => {
     location.reload();
@@ -32,13 +32,13 @@ export const ErrorPage = (): ReactElement => {
         }}
       />
       <Typography variant="h4" component="h1" gutterBottom>
-        {intl.formatMessage({ id: 'errorPage.title' })}
+        {t('errorPage.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        {intl.formatMessage({ id: 'errorPage.description' })}
+        {t('errorPage.description')}
       </Typography>
       <Button variant="contained" color="primary" onClick={reloadPage}>
-        {intl.formatMessage({ id: 'errorPage.reloadButton' })}
+        {t('errorPage.reloadButton')}
       </Button>
     </Box>
   );

@@ -1,0 +1,45 @@
+{
+  "appName": "Movies",
+  "navigation": {
+    "home": "Home",
+    "settings": "Settings"
+  },
+  "no_selected_movies": "No selected movies",
+  "share_with_friends": "Share with friends",
+  "copied": "Copied",
+  "delete": "Delete",
+  "select": "Select",
+  "put_the_list_name": "Put the list name",
+  "filters": {
+    "submit": "Submit",
+    "release_year": "Release Year",
+    "year": "Year",
+    "sort_by": "Sort By",
+    "sort_direction": "Sort Direction",
+    "include_adult": "Include Adult",
+    "genre": "Genre",
+    "sort_direction_options": {
+      "asc": "Ascending",
+      "desc": "Descending"
+    },
+    "sort": {
+      "Title": "Title",
+      "Release Year": "Release Year"
+    }
+  },
+  "errorPage": {
+    "title": "An error occurred",
+    "description": "Sorry, an unexpected error occurred. Please try refreshing the page.",
+    "reloadButton": "Refresh page"
+  },
+  "forbiddenPage": {
+    "title": "403 - Access Forbidden",
+    "description": "You do not have permission to access this page.",
+    "goBack": "Go Back"
+  },
+  "notFoundPage": {
+    "title": "404 - Page Not Found",
+    "description": "The page you are looking for does not exist.",
+    "goHome": "Go Home"
+  }
+}

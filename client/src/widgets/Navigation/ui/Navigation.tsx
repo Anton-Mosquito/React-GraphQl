@@ -13,28 +13,16 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import React, { useState, useContext, useCallback } from 'react';
+import React, { useState } from 'react';
 import type { MouseEvent, KeyboardEvent } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 
-import { LOCALES } from '../../../const';
-import { AppContext } from '../../../providers/appContext';
-import translate from '@/shared/utils/translate';
+import { LangSwitcher } from '@/shared/ui/LangSwitcher/LangSwitcher';
 
 export const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
-  const { state, dispatch } = useContext(AppContext) as any;
-
-  const setLanguage = useCallback(
-    (locale: string) => {
-      dispatch({
-        type: 'setLocale',
-        locale,
-      });
-    },
-    [dispatch],
-  );
+  const { t } = useTranslation();
 
   const toggleDrawer = (open: boolean) => (event: MouseEvent | KeyboardEvent) => {
     if (
@@ -60,7 +48,7 @@ export const Navigation = () => {
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
-            <ListItemText primary={translate('navigation.settings')} />
+            <ListItemText primary={t('navigation.settings')} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -83,33 +71,17 @@ export const Navigation = () => {
           </IconButton>
           <Link component={RouterLink} to="/" sx={{ flexGrow: 1 }}>
             <Typography variant="h6" component="div" sx={{ color: 'white' }}>
-              <FormattedMessage id="navigation.home" />
+              {t('navigation.home')}
             </Typography>
           </Link>
-          <Box>
-            <Button
-              disabled={state.locale === LOCALES.ENGLISH}
-              sx={{ my: 2, color: 'white' }}
-              onClick={() => setLanguage(LOCALES.ENGLISH)}
-            >
-              ENGLISH
-            </Button>
-
-            <Button
-              disabled={state.locale === LOCALES.UKRANIAN}
-              sx={{ my: 2, color: 'white' }}
-              onClick={() => setLanguage(LOCALES.UKRANIAN)}
-            >
-              Українська
-            </Button>
-          </Box>
+          <LangSwitcher />
           <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
             <Button
               component={RouterLink}
               to="settings"
               sx={{ my: 2, color: 'white', display: 'block' }}
             >
-              <FormattedMessage id="navigation.settings" />
+              {t('navigation.settings')}
             </Button>
           </Box>
         </Toolbar>

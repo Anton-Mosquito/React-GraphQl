@@ -4,13 +4,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { useIntl, FormattedMessage } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 import { SORT_OPTIONS } from '../../../../const';
 
 export const SortField = () => {
-  const intl = useIntl();
-  const placeholder = intl.formatMessage({ id: 'filters.sort_by' });
+  const { t } = useTranslation();
+  const placeholder = t('filters.sort_by');
 
   return (
     <Field
@@ -27,7 +27,7 @@ export const SortField = () => {
           >
             {SORT_OPTIONS.map(({ label, value }: any) => (
               <MenuItem key={value} value={value}>
-                <FormattedMessage id={`filters.sort.${label}`} />
+                {t(`filters.sort.${label}`)}
               </MenuItem>
             ))}
           </Select>

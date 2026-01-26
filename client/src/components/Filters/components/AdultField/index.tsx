@@ -2,11 +2,11 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 export const AdultField = () => {
-  const intl = useIntl();
-  const label = intl.formatMessage({ id: 'filters.include_adult' });
+  const { t } = useTranslation();
+  const label = t('filters.include_adult');
 
   return (
     <Field

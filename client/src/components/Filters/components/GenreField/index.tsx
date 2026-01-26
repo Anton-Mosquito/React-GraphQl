@@ -4,15 +4,15 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 interface GenreFieldProps {
   data?: any;
 }
 
 export const GenreField = ({ data }: GenreFieldProps) => {
-  const intl = useIntl();
-  const placeholder = intl.formatMessage({ id: 'filters.genre' });
+  const { t } = useTranslation();
+  const placeholder = t('filters.genre');
 
   const genres = data?.genres || [];
 

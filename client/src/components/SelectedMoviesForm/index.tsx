@@ -5,15 +5,15 @@ import InputBase from '@mui/material/InputBase';
 import Paper from '@mui/material/Paper';
 import React from 'react';
 import { Form, Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 interface SelectedMoviesFormProps {
   onSubmit?: (values: { listName?: string }) => void | Promise<void>;
 }
 
 const SelectedMoviesForm = ({ onSubmit }: SelectedMoviesFormProps) => {
-  const intl = useIntl();
-  const placeholder = intl.formatMessage({ id: 'put_the_list_name' });
+  const { t } = useTranslation();
+  const placeholder = t('put_the_list_name');
 
   return (
     <Form

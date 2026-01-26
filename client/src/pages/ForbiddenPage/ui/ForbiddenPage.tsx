@@ -1,9 +1,9 @@
 import { Block } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 const ForbiddenPage = () => {
-  const intl = useIntl();
+  const { t } = useTranslation();
 
   return (
     <Box
@@ -17,13 +17,13 @@ const ForbiddenPage = () => {
     >
       <Block sx={{ fontSize: 100, color: 'error.main', mb: 2 }} />
       <Typography variant="h4" gutterBottom>
-        {intl.formatMessage({ id: 'forbiddenPage.title' })}
+        {t('forbiddenPage.title')}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        {intl.formatMessage({ id: 'forbiddenPage.description' })}
+        {t('forbiddenPage.description')}
       </Typography>
       <Button variant="contained" onClick={() => window.history.back()}>
-        {intl.formatMessage({ id: 'forbiddenPage.goBack' })}
+        {t('forbiddenPage.goBack')}
       </Button>
     </Box>
   );

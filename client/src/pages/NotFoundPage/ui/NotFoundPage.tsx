@@ -1,11 +1,11 @@
 import React from 'react';
 import { ErrorOutline } from '@mui/icons-material';
 import { Box, Typography, Button } from '@mui/material';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
 const NotFoundPage = () => {
-  const intl = useIntl();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleGoHome = () => {
@@ -23,13 +23,13 @@ const NotFoundPage = () => {
     >
       <ErrorOutline sx={{ fontSize: 100, color: 'error.main', mb: 2 }} />
       <Typography variant="h4" gutterBottom>
-        {intl.formatMessage({ id: 'notFoundPage.title' })}
+        {t('notFoundPage.title')}
       </Typography>
       <Typography variant="body1" gutterBottom>
-        {intl.formatMessage({ id: 'notFoundPage.description' })}
+        {t('notFoundPage.description')}
       </Typography>
       <Button variant="contained" onClick={handleGoHome}>
-        {intl.formatMessage({ id: 'notFoundPage.goHome' })}
+        {t('notFoundPage.goHome')}
       </Button>
     </Box>
   );

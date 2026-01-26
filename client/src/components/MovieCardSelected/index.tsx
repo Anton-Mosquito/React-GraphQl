@@ -5,7 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 import type { Movie as HookMovie } from '../../hooks/useMovies';
 import CardMenu from '../MovieCard/components/CardMenu';
@@ -22,6 +22,7 @@ interface MovieCardSelectedProps {
 }
 
 const MovieCardSelected = ({ movie, onCardDelete }: MovieCardSelectedProps) => {
+  const { t } = useTranslation();
   return (
     <Card sx={{ display: 'flex', minHeight: '164px' }}>
       <CardMedia component="img" sx={{ width: 100 }} image={movie.image} alt={movie.title} />
@@ -46,7 +47,7 @@ const MovieCardSelected = ({ movie, onCardDelete }: MovieCardSelectedProps) => {
         </Box>
         <CardMenu>
           <MenuItem onClick={() => onCardDelete?.(movie)}>
-            <FormattedMessage id="delete" />
+            {t('delete')}
           </MenuItem>
         </CardMenu>
       </Box>

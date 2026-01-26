@@ -2,7 +2,7 @@ import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import { Box, Card, CardContent, CardMedia, Typography, MenuItem } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import React from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 import CardMenu from './components/CardMenu';
 import type { Movie as HookMovie } from '../../hooks/useMovies';
@@ -38,12 +38,13 @@ interface MovieCardProps {
 }
 
 const MovieCard = ({ movie, onCardSelect, isPreviewMode = false }: MovieCardProps) => {
+  const { t } = useTranslation();
   return (
     <Card sx={{ maxWidth: 250, position: 'relative' }}>
       {!isPreviewMode && (
         <CardMenu>
           <MenuItem onClick={() => onCardSelect?.(movie)}>
-            <FormattedMessage id="select" />
+            {t('select')}
           </MenuItem>
         </CardMenu>
       )}

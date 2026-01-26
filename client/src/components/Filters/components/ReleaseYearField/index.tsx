@@ -1,11 +1,11 @@
 import TextField from '@mui/material/TextField';
 import React from 'react';
 import { Field } from 'react-final-form';
-import { useIntl } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 export const ReleaseYearField = () => {
-  const intl = useIntl();
-  const label = intl.formatMessage({ id: 'filters.release_year' });
+  const { t } = useTranslation();
+  const label = t('filters.release_year');
 
   return (
     <Field

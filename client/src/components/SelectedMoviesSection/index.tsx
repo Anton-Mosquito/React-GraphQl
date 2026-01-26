@@ -3,12 +3,11 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
-import React, { useState, useContext } from 'react';
-import { FormattedMessage } from 'react-intl';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import noMoviesImageSrc from '../../assets/no_movies.jpg';
 import { MovieCardSelected, SelectedMoviesForm, ConfirmModal } from '../../components';
-import { AppContext } from '../../providers/appContext';
 
 const SelectedMovies = styled(Paper)(({ theme }) => ({
   backgroundColor: '#fff',
@@ -59,13 +58,13 @@ const SelectedMoviesSection = ({
   selectedMovies,
   deleteMovie,
 }: SelectedMoviesSectionProps) => {
+  const { t, i18n } = useTranslation();
   const [listName, setListName] = useState('');
   const [link, setLink] = useState('');
-  const { state } = useContext(AppContext) as any;
 
   const onSubmit = ({ listName: submittedName }: { listName?: string }) => {
     const ids = selectedMovies.map(({ id }) => id);
-    const link = `${window.location.host}/recommend?title=${submittedName || ''}&locale=${state.locale}&ids=${ids.join()}`;
+    const link = `${window.location.host}/recommend?title=${submittedName || ''}&locale=${i18n.language}&ids=${ids.join()}`;
 
     setLink(link);
     setListName(submittedName || '');
@@ -86,7 +85,7 @@ const SelectedMoviesSection = ({
             src={noMoviesImageSrc}
           />
           <Typography variant="h5" mt={2}>
-            <FormattedMessage id="no_selected_movies" />
+            {t('no_selected_movies')}
           </Typography>
         </NoMovies>
       </SelectedMovies>

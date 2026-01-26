@@ -10,7 +10,7 @@ import Modal from '@mui/material/Modal';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import React, { useEffect, useState } from 'react';
-import { FormattedMessage } from 'react-intl';
+import { useTranslation } from 'react-i18next';
 
 import { CONFIRM_TIMEOUT } from '../../const';
 import SocialShare from '../SocialShare';
@@ -40,6 +40,7 @@ const ConfirmModal = ({
   title = '',
   onClose,
 }: ConfirmModalProps) => {
+  const { t } = useTranslation();
   const [openAlert, setOpenAlert] = useState(false);
 
   useEffect(() => {
@@ -109,7 +110,7 @@ const ConfirmModal = ({
         </Paper>
 
         <Typography id="modal-modal-title" variant="h6" component="h3">
-          <FormattedMessage id="share_with_friends" />
+          {t('share_with_friends')}
         </Typography>
 
         <SocialShare url={url} title={title} />
@@ -128,7 +129,7 @@ const ConfirmModal = ({
             }
             sx={{ mt: 2 }}
           >
-            <FormattedMessage id="copied" />
+            {t('copied')}
           </Alert>
         ) : null}
       </Box>
