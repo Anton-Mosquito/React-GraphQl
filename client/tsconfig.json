@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "es5",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "strict": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "allowUmdGlobalAccess": true,
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true,
     "resolveJsonModule": true,
@@ -18,9 +22,22 @@
     "types": ["node", "jest", "react", "react-dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"],
+      "pages/*": ["./src/pages/*"],
+      "components/*": ["./src/components/*"],
+      "hooks/*": ["./src/hooks/*"],
+      "services/*": ["./src/services/*"],
+      "types/*": ["./src/types/*"],
+      "utils/*": ["./src/utils/*"],
+      "providers/*": ["./src/providers/*"],
+      "shared/*": ["./src/shared/*"],
+      "assets/*": ["./src/assets/*"],
+      "app/*": ["./src/app/*"],
+      "messages/*": ["./src/messages/*"],
+      "http/*": ["./src/http/*"],
+      "widgets/*": ["./src/widgets/*"]  
+    },
   },
-  "include": ["src", "vite.config.ts", "env.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "env.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

@@ -69,5 +69,10 @@ export default [
 
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
+    globals: {
+      __IS_DEV__: true,
+      __API__: true,
+      __PROJECT__: true,
+    },
   },
 ];

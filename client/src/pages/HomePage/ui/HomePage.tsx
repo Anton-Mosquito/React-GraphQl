@@ -3,15 +3,14 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
-import React from 'react';
 
-import { MOVIES_QUERY } from './queries';
-import { MovieCard, SelectedMoviesSection } from '../../components';
-import { Filters } from '../../components/Filters';
-import { useFilters } from '../../hooks/useFilters';
-import { useMovies } from '../../hooks/useMovies';
+import { MOVIES_QUERY } from '../queries';
+import { MovieCard, SelectedMoviesSection } from '../../../components';
+import { Filters } from '../../../components/Filters';
+import { useFilters } from '../../../hooks/useFilters';
+import { useMovies } from '../../../hooks/useMovies';
 
-const Home: React.FC = () => {
+const Home = () => {
   const { filter, setPage, setFilter } = useFilters();
   const { loading, error, data } = useQuery(MOVIES_QUERY as any, { variables: { filter } });
   const moviesData: any = data;

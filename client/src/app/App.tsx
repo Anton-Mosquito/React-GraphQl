@@ -8,12 +8,11 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import React, { useContext } from 'react';
-import { Route, Routes } from 'react-router-dom';
 
-import { Navigation } from './components';
-import { Home, Settings, Recommend } from './pages';
-import { AppContext } from './providers/appContext';
-import I18nProvider from './providers/i18n';
+import { Navigation } from 'widgets/Navigation';
+import { AppContext } from '../providers/appContext';
+import I18nProvider from '../providers/i18n';
+import { AppRouter } from './providers/router';
 
 function App(): React.ReactElement {
   const { state } = useContext(AppContext) as any;
@@ -43,11 +42,7 @@ function App(): React.ReactElement {
         <Navigation />
         <Box sx={{ backgroundColor: (theme) => theme.palette.grey[100] }}>
           <Container maxWidth="xl">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="settings" element={<Settings />} />
-              <Route path="recommend" element={<Recommend />} />
-            </Routes>
+            <AppRouter />
           </Container>
         </Box>
       </ApolloProvider>

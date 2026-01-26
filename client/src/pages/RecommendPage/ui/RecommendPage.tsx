@@ -4,8 +4,8 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { MOVIES_BY_IDS_QUERY } from './queries';
-import { MovieCard } from '../../components';
+import { MOVIES_BY_IDS_QUERY } from '../queries';
+import { MovieCard } from '../../../components';
 
 const Recommend: React.FC = () => {
   const [searchParams] = useSearchParams();
