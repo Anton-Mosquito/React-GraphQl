@@ -1,7 +1,5 @@
 import axios from 'axios';
-import { TOKEN_LOCALSTORAGE_KEY } from '@/shared/const/localStorage';
 import type { AxiosResponse } from 'axios';
-import type { AxiosRequestConfig } from 'axios';
 
 import type { AuthResponse } from '@/shared/types/auth';
 
@@ -32,7 +30,7 @@ $api.interceptors.response.use(
         localStorage.setItem('token', response.data.accessToken);
         return $api.request(originalRequest);
       } catch (error) {
-        console.log('Not authorized', error);
+        console.error('Not authorized', error);
       }
     }
     throw error;

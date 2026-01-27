@@ -34,5 +34,10 @@ router.get(
   authMiddleware,
   AuthController.getUsers.bind(AuthController),
 );
+router.get(
+  '/users/:id',
+  authMiddleware,
+  AuthController.getUserById.bind(AuthController),
+);
 
 export default router;

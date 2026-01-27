@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type { Movie as HookMovie } from '../../hooks/useMovies';
+import type { Movie as HookMovie } from '../../shared/lib/hooks/useMovies';
 import CardMenu from '../MovieCard/components/CardMenu';
 
 interface MovieCardSelectedProps {

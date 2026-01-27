@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 import CardMenu from './components/CardMenu';
-import type { Movie as HookMovie } from '../../hooks/useMovies';
+import type { Movie as HookMovie } from '../../shared/lib/hooks/useMovies';
 
 const CardInfo = styled(CardContent)(({ theme }) => ({
   '&:last-child': {

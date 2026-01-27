@@ -1,4 +1,4 @@
-import React from 'react';
+import LanguageIcon from '@mui/icons-material/Language';
 import {
   FormControl,
   Select,
@@ -7,8 +7,8 @@ import {
   type SelectChangeEvent,
   InputAdornment,
 } from '@mui/material';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import LanguageIcon from '@mui/icons-material/Language';
 
 import { LOCALES } from '@/const';
 

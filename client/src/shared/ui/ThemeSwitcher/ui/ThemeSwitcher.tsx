@@ -1,8 +1,9 @@
 import Brightness4Icon from '@mui/icons-material/Brightness4'; // Місяць
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import { IconButton } from '@mui/material';
-import { useTheme } from '@/shared/lib/hooks/useTheme/useTheme';
+
 import { Theme } from '@/shared/const/theme';
+import { useTheme } from '@/shared/lib/hooks/useTheme/useTheme';
 
 interface ThemeSwitcherProps {
   className?: string;

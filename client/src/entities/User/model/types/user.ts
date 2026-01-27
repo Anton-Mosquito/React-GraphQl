@@ -1,9 +1,11 @@
-import { type UserRole } from '../consts/consts';
 import { type JsonSettings } from './jsonSettings';
+import { type UserRole } from '../consts/consts';
 
 export interface User {
   id: string;
-  username: string;
+  email: string;
+  isActivated: boolean;
+  username?: string;
   avatar?: string;
   roles?: UserRole[];
   jsonSettings?: JsonSettings;

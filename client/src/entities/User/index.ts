@@ -7,6 +7,6 @@ export type { UserSchema, User } from './model/types/user';
 
 export { UserRole } from './model/consts/consts';
 
-export { saveJsonSettings } from './model/services/saveJsonSettings';
+// export { saveJsonSettings } from './model/services/saveJsonSettings';
 export { initAuthData } from './model/services/initAuthData';
 export { logout } from './model/services/logout';

@@ -106,6 +106,19 @@ class AuthController {
       return next(err);
     }
   }
+
+  async getUserById(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): Promise<Response | void> {
+    try {
+      const user = await UsersService.getUserById(req.params['id']);
+      return res.json(user);
+    } catch (err) {
+      return next(err);
+    }
+  }
 }
 
 export default new AuthController();

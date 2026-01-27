@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { SORT_DIRECTION } from '../../const';
+import { SORT_DIRECTION } from '../../../../const';
 
 export type Filters = {
   page: number;

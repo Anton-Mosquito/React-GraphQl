@@ -5,6 +5,7 @@ import {
   type Reducer,
 } from '@reduxjs/toolkit';
 import { type AxiosInstance } from 'axios';
+
 import { type UserSchema } from '@/entities/User';
 import { type LoginSchema } from '@/features/AuthByUsername';
 import { type rtkApi } from '@/shared/api/rtkApi';

@@ -1,7 +1,11 @@
+import { createAsyncThunk } from '@reduxjs/toolkit';
+
+
 import { type ThunkConfig } from '@/app/providers/StoreProvider';
 import { userActions, type User } from '@/entities/User';
-import { createAsyncThunk } from '@reduxjs/toolkit';
+import { TOKEN_LOCALSTORAGE_KEY } from '@/shared/const/localStorage';
 import type { AuthResponse } from '@/shared/types/auth';
+
 
 interface LoginByNameProps {
   username: string;
@@ -19,7 +23,7 @@ export const loginByUserName = createAsyncThunk<User, LoginByNameProps, ThunkCon
         throw new Error();
       }
 
-      localStorage.setItem('token', response.data.accessToken);
+      localStorage.setItem(TOKEN_LOCALSTORAGE_KEY, response.data.accessToken);
       dispatch(userActions.setAuthData(response.data.user));
 
       // extra.navigate('/profile')
@@ -27,7 +31,8 @@ export const loginByUserName = createAsyncThunk<User, LoginByNameProps, ThunkCon
       return response.data.user;
     } catch (error) {
       console.error('🚀 ~ error:', error);
-      return rejectWithValue('Invalid data');
+      const message = error?.response?.data?.message || 'invalidData';
+      return rejectWithValue(message);
     }
   },
 );

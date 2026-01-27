@@ -1,5 +1,6 @@
-import { type StateSchema } from '@/app/providers/StoreProvider';
 import { useSelector } from 'react-redux';
+
+import { type StateSchema } from '@/app/providers/StoreProvider';
 
 type Selector<T, Args extends any[]> = (state: StateSchema, ...args: Args) => T;
 type Hook<T, Args extends any[]> = (...args: Args) => T;

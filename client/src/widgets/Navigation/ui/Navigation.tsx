@@ -1,29 +1,33 @@
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuIcon from '@mui/icons-material/Menu';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { Link } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import React, { useState } from 'react';
 import type { MouseEvent, KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { getUserAuthData } from '@/entities/User';
+import { logout } from '@/entities/User';
+import { useAppDispatch } from '@/shared/lib/hooks';
 import { LangSwitcher } from '@/shared/ui/LangSwitcher/ui/LangSwitcher';
 import { ThemeSwitcher } from '@/shared/ui/ThemeSwitcher/ui/ThemeSwitcher';
 
+import { NavigationDrawer } from './NavigationDrawer';
+
 export const Navigation = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const authData = useSelector(getUserAuthData);
 
   const toggleDrawer = (open: boolean) => (event: MouseEvent | KeyboardEvent) => {
     if (
@@ -36,40 +40,35 @@ export const Navigation = () => {
     setDrawerOpen(open);
   };
 
-  const list = () => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton component={RouterLink} to="settings">
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary={t('navigation.settings')} />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </Box>
-  );
+  const handleMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    handleClose();
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2, display: { lg: 'block', xs: 'block' } }}
-            onClick={toggleDrawer(true)}
-          >
-            <MenuIcon />
-          </IconButton>
+          {authData && (
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2, display: { lg: 'block', xs: 'block' } }}
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Link component={RouterLink} to="/" sx={{ flexGrow: 1 }}>
             <Typography variant="h6" component="div" sx={{ color: 'white' }}>
               {t('navigation.home')}
@@ -77,20 +76,43 @@ export const Navigation = () => {
           </Link>
           <LangSwitcher />
           <ThemeSwitcher />
-          <Box sx={{ display: { xs: 'none', lg: 'flex' } }}>
-            <Button
-              component={RouterLink}
-              to="settings"
-              sx={{ my: 2, color: 'white', display: 'block' }}
-            >
-              {t('navigation.settings')}
-            </Button>
-          </Box>
+          {authData && (
+            <div>
+              <IconButton
+                size="large"
+                aria-label="account of current user"
+                aria-controls="menu-appbar"
+                aria-haspopup="true"
+                onClick={handleMenu}
+                color="inherit"
+              >
+                <AccountCircle />
+              </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorEl}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+              >
+                <MenuItem component={RouterLink} to="/settings" onClick={handleClose}>
+                  {t('navigation.settings')}
+                </MenuItem>
+                <MenuItem onClick={handleLogout}>{t('logout')}</MenuItem>
+              </Menu>
+            </div>
+          )}
         </Toolbar>
       </AppBar>
-      <Drawer anchor="left" open={isDrawerOpen} onClose={toggleDrawer(false)}>
-        {list()}
-      </Drawer>
+      {authData && <NavigationDrawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} />}
     </Box>
   );
 };
