@@ -24,6 +24,8 @@ services:
       dockerfile: Dockerfile
     # Команда спочатку пушить схему в БД, потім запускає сервер
     command: sh -c "npx prisma db push --accept-data-loss && npm run dev"
+    ports:
+      - "5001:5001"
     volumes:
       - ./server:/usr/src/app
       - /usr/src/app/node_modules
@@ -68,6 +70,7 @@ services:
     environment:
       - WATCHPACK_POLLING=true # Допомагає з Hot Reload на деяких системах
       - HOST=0.0.0.0
+      - VITE_API_URL=/api
 
   nginx:
     image: nginx:alpine

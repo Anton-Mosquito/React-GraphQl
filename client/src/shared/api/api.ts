@@ -5,7 +5,7 @@ import type { AuthResponse } from '@/shared/types/auth';
 
 export const $api = axios.create({
   withCredentials: true,
-  baseURL: import.meta.env.API_URL,
+  baseURL: import.meta.env.VITE_API_URL,
 });
 
 $api.interceptors.request.use((config) => {
@@ -24,7 +24,7 @@ $api.interceptors.response.use(
     if (error.response.status === 401 && error.config && !error.config?._isRetry) {
       originalRequest._isRetry = true;
       try {
-        const response = await axios.get<AuthResponse>(`${import.meta.env.API_URL}/refresh`, {
+        const response = await axios.get<AuthResponse>(`${import.meta.env.VITE_API_URL}/refresh`, {
           withCredentials: true,
         });
         localStorage.setItem('token', response.data.accessToken);

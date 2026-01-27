@@ -5,7 +5,13 @@ import path from 'path';
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://server:5001',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     sourcemap: true
@@ -15,5 +21,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     }
   },
-  envPrefix: [],
 });

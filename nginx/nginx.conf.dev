@@ -21,6 +21,13 @@ server {
         proxy_set_header Host $host;
     }
 
+    # Проксі для Health Check
+    location /health {
+        proxy_pass http://server:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+    }
+
     # WebSocket для сервера (якщо використовуєш корінь / для WS)
     # Якщо твій сервер слухає WS на тому ж порті, що і HTTP, але за окремим шляхом, додай це сюди.
     # Якщо WS на корені, то блок location / нижче може перехоплювати його. 
