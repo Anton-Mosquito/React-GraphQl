@@ -40,15 +40,14 @@ services:
       - DATABASE_URL=postgresql://dev:dev@db:5432/appdb?schema=public
       - NODE_ENV=development
       - CLIENT_URL=http://localhost:80
-      - API_URL=http://localhost:5001
+      - API_URL=${API_URL}
       - TMDB_API_KEY=${TMDB_API_KEY}
       - TMDB_API_BASE_URL=${TMDB_API_BASE_URL}
       - TMDB_IMAGE_BASE_PATH=${TMDB_IMAGE_BASE_PATH}
-      - SMTP_SERVICE=${SMTP_SERVICE}
-      - GOOGLE_CLIENT=${GOOGLE_CLIENT}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
-      - GOOGLE_REFRESH_TOKEN=${GOOGLE_REFRESH_TOKEN}
+      - MAIL_USER=${MAIL_USER}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OAUTH_REFRESH_TOKEN=${OAUTH_REFRESH_TOKEN}
       - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
 
@@ -71,6 +70,7 @@ services:
       - WATCHPACK_POLLING=true # Допомагає з Hot Reload на деяких системах
       - HOST=0.0.0.0
       - VITE_API_URL=/api
+      - VITE_WEBSOCKET_URL=${VITE_WEBSOCKET_URL}
 
   nginx:
     image: nginx:alpine

@@ -3,15 +3,16 @@
   "navigation": {
     "home": "Home",
     "movies": "Movies",
+    "canvas": "Canvas",
     "settings": "Settings"
   },
   "login": {
     "title": "Authorization Form",
-    "username": "Enter username",
+    "email": "Email",
     "password": "Enter password",
     "submit": "Login",
     "submitting": "Logging in...",
-    "usernameRequired": "Username is required",
+    "emailRequired": "Email is required",
     "passwordRequired": "Password is required"
   },
   "register": {
@@ -68,7 +69,8 @@
     },
     "sort": {
       "Title": "Title",
-      "Release Year": "Release Year"
+      "Release Year": "Release Year",
+      "Popularity": "Popularity"
     }
   },
   "errorPage": {

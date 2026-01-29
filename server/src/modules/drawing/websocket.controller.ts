@@ -1,5 +1,7 @@
 import WebSocket, { Server as WSServer, type RawData } from 'ws';
 import { logger } from '#utils/index.js';
+import prisma from '#lib/db.js';
+import { createCanvas } from 'canvas';
 import {
   wsMessageSchema,
   WsMessage,
@@ -16,6 +18,8 @@ export default class WebSocketController {
   private wss: WSServer;
   private readonly MAX_MESSAGE_SIZE = 1024 * 100; // 100KB max message size
   private readonly CONNECTION_TIMEOUT = 60_000; // 60 seconds timeout for uninitialized connections
+  private sessions: Map<string, any[]> = new Map();
+  private saveTimers: Map<string, NodeJS.Timeout> = new Map();
 
   constructor(wss: WSServer) {
     this.wss = wss;
@@ -76,7 +80,10 @@ export default class WebSocketController {
   /**
    * Handle incoming WebSocket message
    */
-  private handleMessage(ws: ExtendedWebSocket, rawMessage: RawData): void {
+  private async handleMessage(
+    ws: ExtendedWebSocket,
+    rawMessage: RawData,
+  ): Promise<void> {
     const messageText = this.rawDataToString(rawMessage);
 
     if (messageText.length > this.MAX_MESSAGE_SIZE) {
@@ -116,19 +123,16 @@ export default class WebSocketController {
     const message = validationResult.data as WsMessage;
 
     if (message.method === 'connection') {
-      this.handleConnectionMessage(ws, message as ConnectionMessage);
+      await this.handleConnectionMessage(ws, message as ConnectionMessage);
     } else if (message.method === 'draw') {
       this.handleDrawMessage(ws, message as DrawMessage);
     }
   }
 
-  /**
-   * Handle connection message (user join/initialization)
-   */
-  private handleConnectionMessage(
+  private async handleConnectionMessage(
     ws: ExtendedWebSocket,
     message: ConnectionMessage,
-  ): void {
+  ): Promise<void> {
     ws.username = message.username;
     ws.id = message.id;
     ws.isInitialized = true;
@@ -138,6 +142,40 @@ export default class WebSocketController {
       id: ws.id,
       connectedAt: ws.connectedAt?.toISOString(),
     });
+
+    // Load saved canvas if exists
+    try {
+      const saved = await prisma.canvasSession.findUnique({
+        where: { sessionId: ws.id },
+      });
+      if (saved?.image) {
+        const historyEvent: BroadcastEvent = {
+          type: WsEventType.LOAD_HISTORY,
+          timestamp: new Date().toISOString(),
+          data: {
+            method: 'load-image',
+            image: saved.image,
+          },
+        };
+        ws.send(JSON.stringify(historyEvent));
+      }
+    } catch (error) {
+      logger.error('Failed to load canvas', { sessionId: ws.id, error });
+    }
+
+    // Send history (which may be empty on restart)
+    const history = this.sessions.get(ws.id!) || [];
+    if (history.length > 0) {
+      const historyEvent: BroadcastEvent = {
+        type: WsEventType.LOAD_HISTORY,
+        timestamp: new Date().toISOString(),
+        data: {
+          method: 'load-history',
+          history,
+        },
+      };
+      ws.send(JSON.stringify(historyEvent));
+    }
 
     const event: BroadcastEvent = {
       type: WsEventType.USER_CONNECTED,
@@ -166,6 +204,18 @@ export default class WebSocketController {
       username: ws.username,
       figureType: message.figure.type,
     });
+
+    // Store in session history
+    if (!this.sessions.has(ws.id!)) {
+      this.sessions.set(ws.id!, []);
+    }
+    this.sessions.get(ws.id!)!.push({
+      ...message,
+      username: ws.username,
+    });
+
+    // Throttle save: save after 5 seconds of inactivity
+    this.throttleSave(ws.id!);
 
     const event: BroadcastEvent = {
       type: WsEventType.DRAW,
@@ -248,7 +298,7 @@ export default class WebSocketController {
   }
 
   /**
-   * Broadcast message to all connected clients except sender
+   * Broadcast message to all connected clients in the same session except sender
    */
   private broadcast(sender: ExtendedWebSocket, event: BroadcastEvent): void {
     const payload = JSON.stringify(event);
@@ -256,7 +306,12 @@ export default class WebSocketController {
     let failCount = 0;
 
     this.wss.clients.forEach((client) => {
-      if (client === sender || client.readyState !== WebSocket.OPEN) {
+      const extClient = client as ExtendedWebSocket;
+      if (
+        client === sender ||
+        client.readyState !== WebSocket.OPEN ||
+        extClient.id !== sender.id
+      ) {
         return;
       }
 
@@ -277,6 +332,70 @@ export default class WebSocketController {
       failCount,
       totalClients: this.wss.clients.size,
     });
+  }
+
+  /**
+   * Save canvas to DB
+   */
+  private async saveCanvas(sessionId: string, history: any[]): Promise<void> {
+    try {
+      const image = this.renderCanvasFromHistory(history);
+      await prisma.canvasSession.upsert({
+        where: { sessionId },
+        update: { image },
+        create: { sessionId, image },
+      });
+    } catch (error) {
+      logger.error('Failed to save canvas', { sessionId, error });
+    }
+  }
+
+  /**
+   * Throttle save: save after 5 seconds of inactivity
+   */
+  private throttleSave(sessionId: string): void {
+    // Clear existing timer
+    const existingTimer = this.saveTimers.get(sessionId);
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+    }
+
+    // Set new timer
+    const timer = setTimeout(() => {
+      const history = this.sessions.get(sessionId);
+      if (history) {
+        this.saveCanvas(sessionId, history);
+      }
+      this.saveTimers.delete(sessionId);
+    }, 5000); // 5 seconds
+
+    this.saveTimers.set(sessionId, timer);
+  }
+
+  /**
+   * Render canvas from history
+   */
+  private renderCanvasFromHistory(history: any[]): string {
+    const canvas = createCanvas(800, 600);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 800, 600);
+
+    history.forEach((msg) => {
+      if (msg.figure.type === 'brush') {
+        const points = msg.figure.points;
+        if (points.length >= 2) {
+          ctx.strokeStyle = msg.figure.color;
+          ctx.lineWidth = msg.figure.stroke;
+          ctx.beginPath();
+          ctx.moveTo(points[0].x, points[0].y);
+          ctx.lineTo(points[1].x, points[1].y);
+          ctx.stroke();
+        }
+      }
+    });
+
+    return canvas.toDataURL();
   }
 
   /**

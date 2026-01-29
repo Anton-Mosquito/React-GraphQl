@@ -6,7 +6,9 @@ class ActivationService {
   /**
    * Activate user account by activation link
    */
-  async activate(input: unknown): Promise<void> {
+  async activate(
+    input: unknown,
+  ): Promise<{ success: boolean; message: string }> {
     const activationLink = activationLinkSchema.parse(input);
 
     logger.debug('ActivationService.activate', { activationLink });
@@ -16,12 +18,21 @@ class ActivationService {
     });
 
     if (!user) {
-      throw ApiError.BadRequest('Invalid activation link');
+      logger.warn('Activation link not found or already used', {
+        activationLink,
+      });
+      return {
+        success: false,
+        message: 'Activation link is invalid or has already been used',
+      };
     }
 
     if (user.isActivated) {
       logger.debug('User already activated', { userId: user.id });
-      return;
+      return {
+        success: true,
+        message: 'Account is already activated',
+      };
     }
 
     await prisma.user.update({
@@ -33,6 +44,11 @@ class ActivationService {
     });
 
     logger.info('User activated', { userId: user.id, email: user.email });
+
+    return {
+      success: true,
+      message: 'Account activated successfully',
+    };
   }
 
   /**

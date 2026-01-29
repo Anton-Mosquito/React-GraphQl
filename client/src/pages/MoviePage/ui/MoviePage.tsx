@@ -3,21 +3,21 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Pagination from '@mui/material/Pagination';
 import Paper from '@mui/material/Paper';
+import type { ChangeEvent } from 'react';
 
+import { MovieCard } from '@/entities/movie';
+import { Filters } from '@/features/filter-movies';
+import type { FilterFormValues } from '@/features/filter-movies';
+import type { MoviesQuery } from '@/gql/graphql';
 import { useFilters } from '@/shared/lib/hooks/useFilters';
-import { useMovies } from '@/shared/lib/hooks/useMovies';
 
-import { MovieCard, SelectedMoviesSection } from '../../../components';
-import { Filters } from '../../../components/Filters';
 import { MOVIES_QUERY } from '../queries';
 
-const Home = () => {
+const Movie = () => {
   const { filter, setPage, setFilter } = useFilters();
-  const { loading, error, data } = useQuery(MOVIES_QUERY as any, { variables: { filter } });
-  const moviesData: any = data;
-  const { selectedMovies, selectMovie, deleteMovie } = useMovies();
+  const { loading, error, data } = useQuery<MoviesQuery>(MOVIES_QUERY, { variables: { filter } });
 
-  const paginationHandler = (_event: any, page: number) => {
+  const paginationHandler = (_event: ChangeEvent<unknown>, page: number) => {
     setPage(page);
   };
 
@@ -25,11 +25,12 @@ const Home = () => {
     return <>Error</>;
   }
 
-  const onSubmit = (values: any) => {
+  const onSubmit = (values: FilterFormValues) => {
     setFilter(values);
   };
 
-  const pagesCount = moviesData?.movies?.totalPages <= 500 ? moviesData?.movies?.totalPages : 500;
+  const pagesCount =
+    data?.movies?.totalPages && data.movies.totalPages <= 500 ? data.movies.totalPages : 500;
 
   return (
     <Box sx={{ flexGrow: 1, marginTop: 2 }}>
@@ -39,18 +40,13 @@ const Home = () => {
             <Filters onSubmit={onSubmit} initialValues={filter} />
           </Paper>
         </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            md: 8,
-          }}
-        >
+        <Grid size={12}>
           <Paper>
             <Box sx={{ flexGrow: 1, padding: 1 }}>
               {loading && 'Loading...'}
-              {moviesData && (
+              {data?.movies && (
                 <Grid container spacing={2}>
-                  {moviesData.movies.results.map((movie: any) => (
+                  {data.movies.results.map((movie) => (
                     <Grid
                       key={movie.id}
                       size={{
@@ -60,7 +56,7 @@ const Home = () => {
                         lg: 3,
                       }}
                     >
-                      <MovieCard movie={movie} onCardSelect={selectMovie} />
+                      <MovieCard movie={movie} />
                     </Grid>
                   ))}
                 </Grid>
@@ -71,17 +67,9 @@ const Home = () => {
             </Box>
           </Paper>
         </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            md: 4,
-          }}
-        >
-          <SelectedMoviesSection selectedMovies={selectedMovies} deleteMovie={deleteMovie} />
-        </Grid>
       </Grid>
     </Box>
   );
 };
 
-export default Home;
+export default Movie;

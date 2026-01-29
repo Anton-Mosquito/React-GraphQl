@@ -10,7 +10,10 @@ import {
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { LOCALES } from '@/const';
+const LOCALES = {
+  ENGLISH: 'en-US',
+  UKRANIAN: 'uk-UA',
+} as const;
 
 interface LangSwitcherProps {
   className?: string;

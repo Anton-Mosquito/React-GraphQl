@@ -22,15 +22,6 @@ const envSchema = z.object({
   TMDB_API_BASE_URL: z.string().url(),
   TMDB_IMAGE_BASE_PATH: z.string().url(),
 
-  // Email SMTP
-  SMTP_SERVICE: z.string().min(1),
-
-  // Google OAuth for email
-  GOOGLE_CLIENT: z.string().min(1),
-  GOOGLE_CLIENT_ID: z.string().min(1),
-  GOOGLE_CLIENT_SECRET: z.string().min(1),
-  GOOGLE_REFRESH_TOKEN: z.string().min(1),
-
   // JWT Secrets
   JWT_ACCESS_SECRET: z
     .string()

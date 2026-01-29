@@ -19,11 +19,10 @@ export const initAuthData = createAsyncThunk<User, void, ThunkConfig<string>>(
 
     try {
       const response = await dispatch(getUserDataByIdQuery(userId)).unwrap();
-
       return response;
     } catch (error) {
       console.error('🚀 ~ error:', error);
-      return rejectWithValue('');
+      return rejectWithValue('failed to load user data');
     }
   },
 );

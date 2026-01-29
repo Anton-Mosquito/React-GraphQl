@@ -3,7 +3,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 
 import { getUserAuthData } from '@/entities/User';
-import { AuthTabs } from '@/features/AuthByUsername/ui/AuthTabs/AuthTabs';
+import { AuthTabs } from '@/features/AuthByEmail/ui/AuthTabs/AuthTabs';
 
 const HomePage = () => {
   const authData = useSelector(getUserAuthData);

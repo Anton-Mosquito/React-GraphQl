@@ -3,15 +3,16 @@
   "navigation": {
     "home": "Головна",
     "movies": "Фільми",
+    "canvas": "Канвас",
     "settings": "Налаштування"
   },
   "login": {
     "title": "Форма авторизації",
-    "username": "Введіть ім'я користувача",
+    "email": "Електронна пошта",
     "password": "Введіть пароль",
     "submit": "Увійти",
     "submitting": "Вхід...",
-    "usernameRequired": "Ім'я користувача обов'язкове",
+    "emailRequired": "Електронна пошта обов'язкова",
     "passwordRequired": "Пароль обов'язковий"
   },
   "register": {
@@ -68,7 +69,8 @@
     },
     "sort": {
       "Title": "Назва",
-      "Release Year": "Рік випуску"
+      "Release Year": "Рік випуску",
+      "Popularity": "Популярність"
     }
   },
   "errorPage": {

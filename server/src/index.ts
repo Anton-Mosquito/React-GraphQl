@@ -42,6 +42,9 @@ async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
+  // Trust proxy for rate limiting (nginx)
+  app.set('trust proxy', 1);
+
   const wsInstance = expressWs(app, httpServer);
   const wsApp = wsInstance.app as express.Application;
   const wss = wsInstance.getWss();
@@ -168,11 +171,6 @@ async function startApolloServer() {
         mail: mailConfigured ? 'configured' : 'not_configured',
       },
     });
-  });
-
-  // Simple REST test endpoint
-  app.get('/rest', (_req, res) => {
-    res.json({ data: 'rest works' });
   });
 
   // Wire WebSocket route (express-ws)

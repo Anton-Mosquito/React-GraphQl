@@ -7,8 +7,9 @@ import {
 import { type AxiosInstance } from 'axios';
 
 import { type UserSchema } from '@/entities/User';
-import { type LoginSchema } from '@/features/AuthByUsername';
 import { type rtkApi } from '@/shared/api/rtkApi';
+
+import { type LoginSchema } from '@/features/AuthByUsername';
 
 export interface StateSchema {
   user: UserSchema;

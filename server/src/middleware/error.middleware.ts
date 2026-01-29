@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { logger } from '../utils/index.js';
+import { logger, AppError, ApiError } from '../utils/index.js';
 import { env } from '#config/env.js';
+import { ErrorResponse } from '#types/index.js';
 
 export function errorHandler(
   err: Error,
@@ -12,6 +13,20 @@ export function errorHandler(
     error: err.message,
     stack: err.stack,
   });
+
+  if (err instanceof AppError) {
+    const response: ErrorResponse = {
+      error: err.status,
+      message: err.message,
+    };
+
+    if (err instanceof ApiError && err.errors) {
+      response.errors = err.errors;
+    }
+
+    res.status(err.statusCode).json(response);
+    return;
+  }
 
   res.status(500).json({
     error: 'Internal Server Error',

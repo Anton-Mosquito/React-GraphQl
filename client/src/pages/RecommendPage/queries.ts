@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../gql';
 
-export const MOVIES_BY_IDS_QUERY = gql`
+export const MOVIES_BY_IDS_QUERY = graphql(`
   query MoviesByIds($ids: [Int]) {
     moviesByIds(ids: $ids) {
       id
@@ -9,4 +9,4 @@ export const MOVIES_BY_IDS_QUERY = gql`
       releaseDate(format: "dd.MM.yyyy")
     }
   }
-`;
+`);

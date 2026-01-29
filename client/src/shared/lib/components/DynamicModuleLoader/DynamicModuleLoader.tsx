@@ -45,6 +45,6 @@ export const DynamicModuleLoader = ({
         });
       }
     };
-  }, []);
+  }, [dispatch, reducers, removeAfterUnmount, store.reducerManager]);
   return <>{children}</>;
 };

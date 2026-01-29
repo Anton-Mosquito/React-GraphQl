@@ -29,7 +29,7 @@ const userApi = rtkApi.injectEndpoints({
         method: 'POST',
       }),
     }),
-    activate: build.query<{ message: string }, string>({
+    activate: build.query<{ success: boolean; message: string }, string>({
       query: (link) => ({
         url: `/activate/${link}`,
         method: 'GET',
@@ -42,3 +42,5 @@ const userApi = rtkApi.injectEndpoints({
 export const getUserDataByIdQuery = userApi.endpoints.getUserDataById.initiate;
 export const logoutMutation = userApi.endpoints.logout.initiate;
 export const activateQuery = userApi.endpoints.activate.initiate;
+
+export const { useActivateQuery } = userApi;

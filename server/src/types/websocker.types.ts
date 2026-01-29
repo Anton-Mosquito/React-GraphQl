@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { WsMessage } from '#schema/index.js';
+import { WsMessage, LoadHistoryMessage, LoadImageMessage } from '#schema/index.js';
 
 export interface ExtendedWebSocket extends WebSocket {
   id?: string;
@@ -13,10 +13,11 @@ export const enum WsEventType {
   USER_DISCONNECTED = 'user_disconnected',
   DRAW = 'draw',
   ERROR = 'error',
+  LOAD_HISTORY = 'load_history',
 }
 
 export interface BroadcastEvent {
   type: WsEventType;
   timestamp: string;
-  data: WsMessage | { message: string };
+  data: WsMessage | LoadHistoryMessage | LoadImageMessage | { message: string };
 }

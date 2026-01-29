@@ -4,7 +4,9 @@ import Typography from '@mui/material/Typography';
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { MovieCard } from '../../../components';
+import { MovieCard } from '@/entities/movie';
+import type { MoviesByIdsQuery } from '@/gql/graphql';
+
 import { MOVIES_BY_IDS_QUERY } from '../queries';
 
 const Recommend = () => {
@@ -13,10 +15,9 @@ const Recommend = () => {
   const idsParam = searchParams.get('ids') || '';
   const ids = idsParam ? idsParam.split(',').map((id) => +id) : [];
 
-  const { loading, error, data } = useQuery(MOVIES_BY_IDS_QUERY as any, {
+  const { loading, error, data } = useQuery<MoviesByIdsQuery>(MOVIES_BY_IDS_QUERY, {
     variables: { ids },
   });
-  const moviesData: any = data;
 
   if (loading) {
     return <div>Loading...</div>;
@@ -31,21 +32,23 @@ const Recommend = () => {
       <Typography variant="h1" component="h1" gutterBottom>
         {searchParams.get('title')}
       </Typography>
-      {moviesData?.moviesByIds && (
+      {data?.moviesByIds && (
         <Grid container spacing={2}>
-          {moviesData.moviesByIds.map((movie: any) => (
-            <Grid
-              key={movie.id}
-              size={{
-                xs: 12,
-                sm: 6,
-                md: 4,
-                lg: 3,
-              }}
-            >
-              <MovieCard movie={movie} isPreviewMode />
-            </Grid>
-          ))}
+          {data.moviesByIds
+            .filter((movie) => movie !== null)
+            .map((movie) => (
+              <Grid
+                key={movie.id}
+                size={{
+                  xs: 12,
+                  sm: 6,
+                  md: 4,
+                  lg: 3,
+                }}
+              >
+                <MovieCard movie={movie} isPreviewMode />
+              </Grid>
+            ))}
         </Grid>
       )}
     </>

@@ -6,7 +6,6 @@ import {
   AuthService,
 } from '#modules/index.js';
 import { extractRefreshToken, ApiError } from '#utils/index.js';
-import { env } from '#config/env.js';
 
 class AuthController {
   async registration(
@@ -67,9 +66,9 @@ class AuthController {
         return next(ApiError.BadRequest('Activation link is required'));
       }
 
-      await ActivationService.activate(link);
+      const result = await ActivationService.activate(link);
 
-      return res.redirect(env.CLIENT_URL);
+      return res.json(result);
     } catch (err) {
       return next(err);
     }

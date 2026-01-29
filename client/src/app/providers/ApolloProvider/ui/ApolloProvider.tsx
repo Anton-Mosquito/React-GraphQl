@@ -10,7 +10,7 @@ type ApolloProviderProps = {
 const ApolloProviderComponent = ({ children }: ApolloProviderProps) => {
   const { i18n } = useTranslation();
   const client = useMemo(() => {
-    const httpLink = new HttpLink({ uri: `http://localhost:5000/graphql` });
+    const httpLink = new HttpLink({ uri: `http://localhost:5001/graphql` });
     const localeMiddleware = new ApolloLink((operation, forward) => {
       const customHeaders = Object.hasOwn(operation.getContext(), 'headers')
         ? operation.getContext().headers

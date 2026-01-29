@@ -1,9 +1,8 @@
 import { Box, CircularProgress, Typography, Button, Alert } from '@mui/material';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
 
-import { activateQuery } from '@/entities/User/api/userApi';
+import { useActivateQuery } from '@/entities/User/api/userApi';
 import { getRouteMain } from '@/shared/const/router';
 
 const ActivatePage = () => {
@@ -11,13 +10,7 @@ const ActivatePage = () => {
   const { link } = useParams<{ link: string }>();
   const navigate = useNavigate();
 
-  const [activate, { data, isLoading, error }] = activateQuery();
-
-  useEffect(() => {
-    if (link) {
-      activate(link);
-    }
-  }, [link, activate]);
+  const { data, isLoading, error } = useActivateQuery(link);
 
   const handleGoToLogin = () => {
     navigate(getRouteMain());
@@ -60,7 +53,11 @@ const ActivatePage = () => {
         <Alert severity="error" sx={{ mb: 3, maxWidth: 400 }} role="alert" aria-live="assertive">
           {t('activatePage.error')}
         </Alert>
-        <Button variant="contained" onClick={handleGoToLogin} aria-label={t('activatePage.goToLogin')}>
+        <Button
+          variant="contained"
+          onClick={handleGoToLogin}
+          aria-label={t('activatePage.goToLogin')}
+        >
           {t('activatePage.goToLogin')}
         </Button>
       </Box>
@@ -68,6 +65,7 @@ const ActivatePage = () => {
   }
 
   if (data) {
+    const severity = data.success ? 'success' : 'warning';
     return (
       <Box
         sx={{
@@ -80,10 +78,14 @@ const ActivatePage = () => {
           p: 3,
         }}
       >
-        <Alert severity="success" sx={{ mb: 3, maxWidth: 400 }} role="alert" aria-live="assertive">
-          {t('activatePage.success')}
+        <Alert severity={severity} sx={{ mb: 3, maxWidth: 400 }} role="alert" aria-live="assertive">
+          {data.message}
         </Alert>
-        <Button variant="contained" onClick={handleGoToLogin} aria-label={t('activatePage.goToLogin')}>
+        <Button
+          variant="contained"
+          onClick={handleGoToLogin}
+          aria-label={t('activatePage.goToLogin')}
+        >
           {t('activatePage.goToLogin')}
         </Button>
       </Box>

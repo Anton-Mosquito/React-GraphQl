@@ -1,17 +1,15 @@
-import { type ReactNode, useMemo } from 'react';
-
-import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import { ukUA, enUS } from '@mui/material/locale';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { type ReactNode, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-
-import { useTranslation } from 'react-i18next';
 
 import { Theme } from '@/shared/const/theme';
 import { useTheme } from '@/shared/lib/hooks/useTheme/useTheme';

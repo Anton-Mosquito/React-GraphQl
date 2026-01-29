@@ -1,5 +1,3 @@
-import MenuIcon from '@mui/icons-material/Menu';
-import MovieIcon from '@mui/icons-material/Movie';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import List from '@mui/material/List';
@@ -11,6 +9,8 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 
+import { navigationConfig } from '@/shared/config/navigation/navigation';
+
 interface NavigationDrawerProps {
   isOpen: boolean;
   onClose: () => void;
@@ -19,33 +19,28 @@ interface NavigationDrawerProps {
 export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();
 
-  const list = useCallback(() => (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-      onClick={onClose}
-      onKeyDown={onClose}
-    >
-      <List>
-        <ListItem disablePadding>
-          <ListItemButton component={RouterLink} to="/">
-            <ListItemIcon>
-              <MenuIcon />
-            </ListItemIcon>
-            <ListItemText primary={t('navigation.home')} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem disablePadding>
-          <ListItemButton component={RouterLink} to="/movies">
-            <ListItemIcon>
-              <MovieIcon />
-            </ListItemIcon>
-            <ListItemText primary={t('navigation.movies')} />
-          </ListItemButton>
-        </ListItem>
-      </List>
-    </Box>
-  ), [t, onClose]);
+  const list = useCallback(
+    () => (
+      <Box sx={{ width: 250 }} role="presentation" onClick={onClose} onKeyDown={onClose}>
+        <List>
+          {navigationConfig.map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <ListItem key={item.to} disablePadding>
+                <ListItemButton component={RouterLink} to={item.to}>
+                  <ListItemIcon>
+                    <IconComponent />
+                  </ListItemIcon>
+                  <ListItemText primary={t(item.labelKey)} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      </Box>
+    ),
+    [t, onClose],
+  );
 
   return (
     <Drawer anchor="left" open={isOpen} onClose={onClose}>

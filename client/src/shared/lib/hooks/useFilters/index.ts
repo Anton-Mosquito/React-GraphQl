@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 
-import { SORT_DIRECTION } from '../../../../const';
+import { SORT_DIRECTION } from '@/shared/const/sort';
 
 export type Filters = {
   page: number;
@@ -9,6 +9,7 @@ export type Filters = {
   includeAdult: boolean;
   year?: number;
   primaryReleaseYear?: number;
+  genre?: number;
 };
 
 export const useFilters = () => {
@@ -32,7 +33,7 @@ export const useFilters = () => {
   const setFilter = useCallback(
     (
       filterFields: Partial<
-        Filters & { year?: string | number; primaryReleaseYear?: string | number }
+        Filters & { year?: string | number; primaryReleaseYear?: string | number; genre?: string | number }
       >,
     ) => {
       setFilterFields({
@@ -43,6 +44,7 @@ export const useFilters = () => {
           filterFields.primaryReleaseYear !== undefined
             ? +filterFields.primaryReleaseYear
             : filter.primaryReleaseYear,
+        genre: filterFields.genre !== undefined ? +filterFields.genre : filter.genre,
       });
     },
     [filter],

@@ -57,7 +57,7 @@ export const Navigation = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          {authData && (
+          {authData?.isActivated && (
             <IconButton
               size="large"
               edge="start"
@@ -112,7 +112,9 @@ export const Navigation = () => {
           )}
         </Toolbar>
       </AppBar>
-      {authData && <NavigationDrawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} />}
+      {authData?.isActivated && (
+        <NavigationDrawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} />
+      )}
     </Box>
   );
 };

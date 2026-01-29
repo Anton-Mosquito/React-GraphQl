@@ -24,6 +24,7 @@ function buildLimiter(opts: Partial<Options>) {
     standardHeaders: true,
     legacyHeaders: false,
     handler: createHandler('Rate limit exceeded'),
+    // trustProxy: 1, // TODO: fix types
   };
 
   return rateLimit({ ...defaults, ...opts } as Options);

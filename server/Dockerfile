@@ -2,6 +2,16 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
+# Install build dependencies for native packages like canvas
+RUN apk add --no-cache \
+    build-base \
+    cairo-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    pango-dev \
+    pixman-dev
+
 # 1. Копіюємо package.json та встановлюємо залежності (кешування)
 COPY package*.json ./
 RUN npm install

@@ -1,6 +1,6 @@
-import { gql } from '@apollo/client';
+import { graphql } from '../../gql';
 
-export const MOVIES_QUERY = gql`
+export const MOVIES_QUERY = graphql(`
   query Movies($filter: MoviesFilterInput) {
     movies(filter: $filter) {
       page
@@ -14,4 +14,4 @@ export const MOVIES_QUERY = gql`
       }
     }
   }
-`;
+`);

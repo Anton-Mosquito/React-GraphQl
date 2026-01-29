@@ -1,0 +1,1 @@
+export { GenreField } from './GenreField';
