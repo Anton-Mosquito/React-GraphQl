@@ -1,9 +1,53 @@
+# Dependencies
 node_modules
-npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build outputs
 dist
+build
+*.tsbuildinfo
+
+# Environment files
 .env
 .env.local
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
 .git
 .gitignore
+.gitattributes
+
+# Tests
+coverage
+*.test.ts
+*.spec.ts
+__tests__
+__mocks__
+
+# Docs
 *.md
-.DS_Store
+LICENSE
+
+# CI/CD
+.github
+.gitlab-ci.yml
+
+# Misc
+.editorconfig
+.prettierrc
+.eslintrc*

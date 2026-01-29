@@ -1,0 +1,86 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dev -d appdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    command: sh -c "npx prisma db push --accept-data-loss && npm run dev"
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./server:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://dev:dev@db:5432/appdb?schema=public
+      - CLIENT_URL=http://localhost:80
+      - API_URL=${API_URL}
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - TMDB_API_BASE_URL=${TMDB_API_BASE_URL}
+      - TMDB_IMAGE_BASE_PATH=${TMDB_IMAGE_BASE_PATH}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - MAIL_USER=${MAIL_USER}
+      - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
+      - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
+      - OAUTH_REFRESH_TOKEN=${OAUTH_REFRESH_TOKEN}
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    command: npm run dev -- --host 0.0.0.0
+    stdin_open: true
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/usr/src/app
+      - /usr/src/app/node_modules
+    networks:
+      - app-network
+    environment:
+      - VITE_API_URL=/api
+      - VITE_WEBSOCKET_URL=${VITE_WEBSOCKET_URL}
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf.dev:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - server
+      - client
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

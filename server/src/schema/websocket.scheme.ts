@@ -91,6 +91,20 @@ export const drawMessageSchema = z
   })
   .strict();
 
+export const loadHistoryMessageSchema = z
+  .object({
+    method: z.literal('load-history'),
+    history: z.array(drawMessageSchema),
+  })
+  .strict();
+
+export const loadImageMessageSchema = z
+  .object({
+    method: z.literal('load-image'),
+    image: z.string(),
+  })
+  .strict();
+
 export const wsMessageSchema = z.discriminatedUnion('method', [
   connectionMessageSchema,
   drawMessageSchema,
@@ -102,4 +116,6 @@ export type Figure = z.infer<typeof figureSchema>;
 export type FigureTypeEnum = z.infer<typeof FigureType>;
 export type ConnectionMessage = z.infer<typeof connectionMessageSchema>;
 export type DrawMessage = z.infer<typeof drawMessageSchema>;
+export type LoadHistoryMessage = z.infer<typeof loadHistoryMessageSchema>;
+export type LoadImageMessage = z.infer<typeof loadImageMessageSchema>;
 export type WsMessage = z.infer<typeof wsMessageSchema>;

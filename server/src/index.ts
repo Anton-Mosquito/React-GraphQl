@@ -7,7 +7,7 @@ import {
   securityHeaders,
 } from '#middleware/index.js';
 import { MailService, websocketController } from '#modules/index.js';
-import { ExtendedWebSocket, GraphQLContext } from '#types/index.js';
+import { ExtendedWebSocket, GraphQLContext, Resolvers } from '#types/index.js';
 import { getUserFromAuthHeader, logger } from '#utils/index.js';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -42,6 +42,8 @@ async function startApolloServer() {
   const app = express();
   const httpServer = http.createServer(app);
 
+  app.set('trust proxy', 1);
+
   const wsInstance = expressWs(app, httpServer);
   const wsApp = wsInstance.app as express.Application;
   const wss = wsInstance.getWss();
@@ -63,15 +65,13 @@ async function startApolloServer() {
     });
   });
 
-  // Periodic ping to keep connections alive (every 30 seconds)
   setInterval(() => {
     wsController.pingAll();
   }, 30_000);
 
-  // Create Apollo Server instance
   const server = new ApolloServer<GraphQLContext>({
     typeDefs,
-    resolvers: resolvers as any,
+    resolvers: resolvers as Resolvers,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
       ApolloServerPluginLandingPageLocalDefault({
@@ -80,13 +80,11 @@ async function startApolloServer() {
       }),
     ],
     formatError: (formattedError) => {
-      // Log errors
       logger.error('GraphQL Error', {
         message: formattedError.message,
         path: formattedError.path,
         extensions: formattedError.extensions,
       });
-      // Don't expose internal errors in production
       if (env.NODE_ENV === 'production') {
         if (formattedError.extensions?.['code'] === 'INTERNAL_SERVER_ERROR') {
           return {
@@ -102,18 +100,14 @@ async function startApolloServer() {
     },
   });
 
-  // Start Apollo Server
   await server.start();
 
-  // Apply security headers early
   app.use(securityHeaders);
 
-  // Request logging in development
   if (env.NODE_ENV === 'development') {
     app.use(requestLogger);
   }
 
-  // CORS configuration
   const corsOptions = {
     origin:
       env.NODE_ENV === 'production'
@@ -122,15 +116,12 @@ async function startApolloServer() {
     credentials: true,
   };
 
-  // Standard middleware
   app.use(cookieParser());
   app.use(cors<cors.CorsRequest>(corsOptions));
   app.use(express.json({ limit: '10mb' }));
 
-  // REST routes (rate-limited)
   app.use('/api', apiLimiter, restRouter);
 
-  // GraphQL endpoint with auth-aware context
   app.use(
     '/graphql',
     express.json({ limit: '10mb' }),
@@ -156,7 +147,6 @@ async function startApolloServer() {
   app.use(express.static(path.join(__dirname, '../../client/build')));
   app.use(express.static('public'));
 
-  // Health check endpoint
   app.get('/health', (_req, res) => {
     const mailConfigured = MailService.isConfigured();
 
@@ -170,25 +160,16 @@ async function startApolloServer() {
     });
   });
 
-  // Simple REST test endpoint
-  app.get('/rest', (_req, res) => {
-    res.json({ data: 'rest works' });
-  });
-
-  // Wire WebSocket route (express-ws)
   wsApp.ws?.('/', (ws: WebSocket) => {
     wsController.handleConnection(ws as ExtendedWebSocket);
   });
 
-  // Serve client for all other routes
   app.get(/.*/, (_req, res) => {
     res.sendFile(path.join(__dirname, '../../client/build/index.html'));
   });
 
-  // Error handling middleware (must be last)
   app.use(errorHandler);
 
-  // Start server
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: env.PORT }, resolve),
   );
@@ -199,7 +180,6 @@ async function startApolloServer() {
   logger.info(`🌍 Environment: ${env.NODE_ENV}`);
 }
 
-// Start server and handle errors
 startApolloServer().catch((error) => {
   logger.error('Failed to start server', { error });
   process.exit(1);

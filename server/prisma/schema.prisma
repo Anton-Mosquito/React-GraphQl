@@ -28,3 +28,10 @@ model Token {
   userId       String @unique
 }
 
+model CanvasSession {
+  id        String   @id @default(uuid())
+  sessionId String   @unique
+  image     String?  // base64 encoded image
+  updatedAt DateTime @updatedAt
+}
+

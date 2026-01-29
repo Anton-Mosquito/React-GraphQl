@@ -1,20 +1,31 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-import App from './App';
-import { AppContextProvider } from './providers/appContext';
+import App from './app/App';
+import { ApolloProvider } from './app/providers/ApolloProvider';
+import { ErrorBoundary } from './app/providers/ErrorBoundary';
+import './shared/config/i18n/i18';
+import { StoreProvider } from './app/providers/StoreProvider';
+import { ThemeProvider } from './app/providers/ThemeProvider';
 
 const rootEl = document.getElementById('root');
+
 if (!rootEl) throw new Error('Root element not found');
 
 const root = ReactDOM.createRoot(rootEl as HTMLElement);
 root.render(
-  <React.StrictMode>
+  <StrictMode>
     <BrowserRouter>
-      <AppContextProvider>
-        <App />
-      </AppContextProvider>
+      <ErrorBoundary>
+        <StoreProvider>
+          <ThemeProvider>
+            <ApolloProvider>
+              <App />
+            </ApolloProvider>
+          </ThemeProvider>
+        </StoreProvider>
+      </ErrorBoundary>
     </BrowserRouter>
-  </React.StrictMode>,
+  </StrictMode>,
 );

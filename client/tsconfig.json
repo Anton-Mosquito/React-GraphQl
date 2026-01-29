@@ -1,15 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "es5",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "strict": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "allowUmdGlobalAccess": true,
+    "allowSyntheticDefaultImports": true,
     "allowJs": true,
     "checkJs": false,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
     "skipLibCheck": true,
     "noEmit": true,
     "resolveJsonModule": true,
@@ -18,9 +22,9 @@
     "types": ["node", "jest", "react", "react-dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": ["./src/*"]
+    },
   },
-  "include": ["src", "vite.config.ts", "env.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "env.d.ts", "codegen.ts"],
   "exclude": ["node_modules", "dist"]
 }
