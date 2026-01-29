@@ -7,9 +7,9 @@ package-lock.json
 yarn.lock
 
 # Build outputs
-dist
 build
-*.tsbuildinfo
+dist
+.vite
 
 # Environment files
 .env
@@ -35,7 +35,9 @@ Thumbs.db
 # Tests
 coverage
 *.test.ts
+*.test.tsx
 *.spec.ts
+*.spec.tsx
 __tests__
 __mocks__
 
@@ -51,3 +53,5 @@ LICENSE
 .editorconfig
 .prettierrc
 .eslintrc*
+tsconfig.json
+vite.config.ts

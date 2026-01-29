@@ -24,10 +24,17 @@ function buildLimiter(opts: Partial<Options>) {
     standardHeaders: true,
     legacyHeaders: false,
     handler: createHandler('Rate limit exceeded'),
-    // trustProxy: 1, // TODO: fix types
   };
 
-  return rateLimit({ ...defaults, ...opts } as Options);
+  return rateLimit({
+    ...defaults,
+    ...opts,
+    skip: (_req) => {
+      // Trust proxy is set globally on Express app
+      // Rate limiter will use req.ip which respects trust proxy setting
+      return false;
+    },
+  } as Options);
 }
 
 /**

@@ -1,0 +1,74 @@
+# Production Dockerfile for Server
+
+# Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /usr/src/app
+
+# Install system dependencies for canvas
+RUN apk add --no-cache \
+    build-base \
+    cairo-dev \
+    jpeg-dev \
+    giflib-dev \
+    librsvg-dev \
+    pango-dev \
+    pixman-dev
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies for building
+RUN npm ci && npm cache clean --force
+
+# Copy source files
+COPY prisma ./prisma/
+COPY tsconfig.json ./
+COPY src ./src
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build TypeScript to JavaScript
+RUN npm run build
+
+# Production stage
+FROM node:20-alpine
+
+WORKDIR /usr/src/app
+
+# Install runtime dependencies for canvas
+RUN apk add --no-cache \
+    cairo \
+    jpeg \
+    giflib \
+    librsvg \
+    pango \
+    pixman \
+    wget
+
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Copy built files from builder
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/prisma ./prisma
+COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001 && \
+    chown -R nodejs:nodejs /usr/src/app
+
+USER nodejs
+
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:5001/health || exit 1
+
+CMD ["node", "dist/index.js"]

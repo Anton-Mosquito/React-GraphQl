@@ -1,63 +1,77 @@
 server {
     listen 80;
+    server_name localhost;
 
-    # Проксі для API
+    # Compression
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+    gzip_min_length 1000;
+
+    # API proxy
     location /api {
         proxy_pass http://server:5001;
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # WebSocket support
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 
-    # Проксі для GraphQL
+    # GraphQL proxy
     location /graphql {
         proxy_pass http://server:5001;
         proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        # WebSocket support for GraphQL subscriptions
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
+        
+        # Timeouts
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 
-    # Проксі для Health Check
+    # Health check
     location /health {
         proxy_pass http://server:5001;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
+        access_log off;
     }
 
-    # WebSocket для сервера (якщо використовуєш корінь / для WS)
-    # Якщо твій сервер слухає WS на тому ж порті, що і HTTP, але за окремим шляхом, додай це сюди.
-    # Якщо WS на корені, то блок location / нижче може перехоплювати його. 
-    # В Express-ws зазвичай WS йдуть на ті ж шляхи. 
-
-    # Проксі для React Dev Server (Client)
-    location / {
-        proxy_pass http://client:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-    }
-
-    # Спеціальний блок для Hot Module Replacement (HMR) веб-сокетів React/Vite
-    # Для Create React App (Webpack):
-    location /sockjs-node {
-        proxy_pass http://client:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
-        proxy_set_header Host $host;
-    }
-    
-    # Для Vite (зазвичай /ws або @vite):
+    # Vite HMR WebSocket
     location /ws {
         proxy_pass http://client:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    # React Dev Server (Client)
+    location / {
+        proxy_pass http://client:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        
+        # WebSocket support for dev server
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 }

@@ -16,47 +16,43 @@ services:
       retries: 5
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    command: postgres -c listen_addresses='*'
 
   server:
     build:
       context: ./server
-      dockerfile: Dockerfile
-    # Команда спочатку пушить схему в БД, потім запускає сервер
+      dockerfile: Dockerfile.dev
     command: sh -c "npx prisma db push --accept-data-loss && npm run dev"
     ports:
-      - "5001:5001"
+      - "${PORT}:${PORT}"
     volumes:
       - ./server:/usr/src/app
       - /usr/src/app/node_modules
-      - /usr/src/app/client/build # Щоб не перетирати білд клієнта, якщо він там є (опціонально)
     depends_on:
       db:
         condition: service_healthy
     networks:
       - app-network
     environment:
-      - PORT=5001
-      - DATABASE_URL=postgresql://dev:dev@db:5432/appdb?schema=public
+      - PORT=${PORT}
       - NODE_ENV=development
+      - DATABASE_URL=postgresql://dev:dev@db:5432/appdb?schema=public
       - CLIENT_URL=http://localhost:80
       - API_URL=${API_URL}
       - TMDB_API_KEY=${TMDB_API_KEY}
       - TMDB_API_BASE_URL=${TMDB_API_BASE_URL}
       - TMDB_IMAGE_BASE_PATH=${TMDB_IMAGE_BASE_PATH}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - MAIL_USER=${MAIL_USER}
       - OAUTH_CLIENT_ID=${OAUTH_CLIENT_ID}
       - OAUTH_CLIENT_SECRET=${OAUTH_CLIENT_SECRET}
       - OAUTH_REFRESH_TOKEN=${OAUTH_REFRESH_TOKEN}
-      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
-      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
 
   client:
     build:
       context: ./client
-      dockerfile: Dockerfile
-    # Run Vite in host-accessible mode and expose port 3000 for nginx
-    command: sh -c "npm run dev -- --host 0.0.0.0"
+      dockerfile: Dockerfile.dev
+    command: npm run dev -- --host 0.0.0.0
     stdin_open: true
     tty: true
     ports:
@@ -67,8 +63,6 @@ services:
     networks:
       - app-network
     environment:
-      - WATCHPACK_POLLING=true # Допомагає з Hot Reload на деяких системах
-      - HOST=0.0.0.0
       - VITE_API_URL=/api
       - VITE_WEBSOCKET_URL=${VITE_WEBSOCKET_URL}
 
