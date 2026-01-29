@@ -11,10 +11,11 @@ import {
 import React, { memo, useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { LAST_REGISTERED_EMAIL_KEY } from '@/shared/const/localStorage';
 import { DynamicModuleLoader, type ReducersList } from '@/shared/lib/components';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
 import { getErrorTranslationKey } from '@/shared/utils';
 import { saveToStorage } from '@/shared/utils';
 
@@ -39,7 +40,7 @@ const initialReducers: ReducersList = {
 
 const RegisterForm = memo(({ onSuccess: _onSuccess }: RegisterFormProps) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isLoading = useSelector(getRegisterIsLoading);
   const error = useSelector(getRegisterError);
   const [successMessage, setSuccessMessage] = useState<string>('');

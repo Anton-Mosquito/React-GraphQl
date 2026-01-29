@@ -6,7 +6,9 @@ type Selector<T, Args extends unknown[]> = (state: StateSchema, ...args: Args) =
 type Hook<T, Args extends unknown[]> = (...args: Args) => T;
 type Result<T, Args extends unknown[]> = [Hook<T, Args>, Selector<T, Args>];
 
-export function buildSelector<T, Args extends unknown[]>(selector: Selector<T, Args>): Result<T, Args> {
+export function buildSelector<T, Args extends unknown[]>(
+  selector: Selector<T, Args>,
+): Result<T, Args> {
   const useSelectorHook: Hook<T, Args> = (...args: Args) => {
     return useSelector((state: StateSchema) => selector(state, ...args));
   };

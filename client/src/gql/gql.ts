@@ -14,16 +14,14 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-  '\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n': typeof types.GenresDocument;
-  '\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: "dd.MM.yyyy")\n      }\n    }\n  }\n': typeof types.MoviesDocument;
-  '\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: "dd.MM.yyyy")\n    }\n  }\n': typeof types.MoviesByIdsDocument;
+    "\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n": typeof types.GenresDocument,
+    "\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: \"dd.MM.yyyy\")\n      }\n    }\n  }\n": typeof types.MoviesDocument,
+    "\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: \"dd.MM.yyyy\")\n    }\n  }\n": typeof types.MoviesByIdsDocument,
 };
 const documents: Documents = {
-  '\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n': types.GenresDocument,
-  '\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: "dd.MM.yyyy")\n      }\n    }\n  }\n':
-    types.MoviesDocument,
-  '\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: "dd.MM.yyyy")\n    }\n  }\n':
-    types.MoviesByIdsDocument,
+    "\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n": types.GenresDocument,
+    "\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: \"dd.MM.yyyy\")\n      }\n    }\n  }\n": types.MoviesDocument,
+    "\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: \"dd.MM.yyyy\")\n    }\n  }\n": types.MoviesByIdsDocument,
 };
 
 /**
@@ -43,25 +41,18 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(
-  source: '\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n',
-): (typeof documents)['\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n'];
+export function graphql(source: "\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query Genres {\n    genres {\n      id\n      name\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(
-  source: '\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: "dd.MM.yyyy")\n      }\n    }\n  }\n',
-): (typeof documents)['\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: "dd.MM.yyyy")\n      }\n    }\n  }\n'];
+export function graphql(source: "\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: \"dd.MM.yyyy\")\n      }\n    }\n  }\n"): (typeof documents)["\n  query Movies($filter: MoviesFilterInput) {\n    movies(filter: $filter) {\n      page\n      totalResults\n      totalPages\n      results {\n        id\n        title\n        image: posterPath\n        releaseDate(format: \"dd.MM.yyyy\")\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(
-  source: '\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: "dd.MM.yyyy")\n    }\n  }\n',
-): (typeof documents)['\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: "dd.MM.yyyy")\n    }\n  }\n'];
+export function graphql(source: "\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: \"dd.MM.yyyy\")\n    }\n  }\n"): (typeof documents)["\n  query MoviesByIds($ids: [Int]) {\n    moviesByIds(ids: $ids) {\n      id\n      title\n      image: posterPath\n      releaseDate(format: \"dd.MM.yyyy\")\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
 }
 
-export type DocumentType<TDocumentNode extends DocumentNode<any, any>> =
-  TDocumentNode extends DocumentNode<infer TType, any> ? TType : never;
+export type DocumentType<TDocumentNode extends DocumentNode<any, any>> = TDocumentNode extends DocumentNode<  infer TType,  any>  ? TType  : never;

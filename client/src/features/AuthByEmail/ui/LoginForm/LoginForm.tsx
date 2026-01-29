@@ -2,10 +2,11 @@ import { Button, TextField, Typography, Stack, Box, CircularProgress } from '@mu
 import React, { memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { LAST_REGISTERED_EMAIL_KEY } from '@/shared/const/localStorage';
 import { DynamicModuleLoader, type ReducersList } from '@/shared/lib/components';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
 import { getErrorTranslationKey } from '@/shared/utils';
 import { getFromStorage, removeFromStorage } from '@/shared/utils';
 
@@ -28,7 +29,7 @@ const initialReducers: ReducersList = {
 
 const LoginForm = memo(({ onSuccess }: LoginFormProps) => {
   const { t } = useTranslation();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isLoading = useSelector(getLoginIsLoading);
   const error = useSelector(getLoginError);
 

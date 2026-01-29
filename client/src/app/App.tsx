@@ -1,20 +1,37 @@
+import { Box, CircularProgress } from '@mui/material';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 import { getUserInited, initAuthData } from '@/entities/User';
 import MainLayout from '@/shared/layouts/MainLayout/MainLayout';
+import { useAppDispatch } from '@/shared/lib/hooks/useAppDispatch';
 
 import { AppRouter } from './providers/router';
 
 const App = () => {
-  const dispatch = useDispatch();
-  const _inited = useSelector(getUserInited);
+  const dispatch = useAppDispatch();
+  const inited = useSelector(getUserInited);
 
   useEffect(() => {
-    if (!_inited) {
+    if (!inited) {
       dispatch(initAuthData());
     }
-  }, [dispatch, _inited]);
+  }, [dispatch, inited]);
+
+  if (!inited) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <MainLayout>

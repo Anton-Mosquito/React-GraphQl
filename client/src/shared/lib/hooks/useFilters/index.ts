@@ -33,7 +33,11 @@ export const useFilters = () => {
   const setFilter = useCallback(
     (
       filterFields: Partial<
-        Filters & { year?: string | number; primaryReleaseYear?: string | number; genre?: string | number }
+        Filters & {
+          year?: string | number;
+          primaryReleaseYear?: string | number;
+          genre?: string | number;
+        }
       >,
     ) => {
       setFilterFields({

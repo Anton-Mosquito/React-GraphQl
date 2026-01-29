@@ -1,1 +1,1 @@
-export type { CanvasProps, ToolbarProps, DrawFigure, DrawMessage } from './types/canvas';
+export type { CanvasProps, DrawFigure, DrawMessage } from './types/canvas';

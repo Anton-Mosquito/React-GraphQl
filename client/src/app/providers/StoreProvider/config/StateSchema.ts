@@ -7,6 +7,7 @@ import {
 import { type AxiosInstance } from 'axios';
 
 import { type UserSchema } from '@/entities/User';
+import type { CanvasSchema, ToolsSchema } from '@/features/canvas';
 import { type rtkApi } from '@/shared/api/rtkApi';
 
 import { type LoginSchema } from '@/features/AuthByUsername';
@@ -14,6 +15,9 @@ import { type LoginSchema } from '@/features/AuthByUsername';
 export interface StateSchema {
   user: UserSchema;
   [rtkApi.reducerPath]: ReturnType<typeof rtkApi.reducer>;
+
+  canvas: CanvasSchema;
+  tools: ToolsSchema;
 
   loginForm?: LoginSchema;
 }

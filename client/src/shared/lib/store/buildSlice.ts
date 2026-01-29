@@ -8,7 +8,8 @@ import {
   type Slice,
 } from '@reduxjs/toolkit';
 import { useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+
+import { useAppDispatch } from '../hooks/useAppDispatch';
 
 export function buildSlice<
   State,
@@ -24,7 +25,7 @@ export function buildSlice<
   const slice = createSlice(options);
 
   const useActions = (): CaseReducerActions<CaseReducers, Name> => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
 
     return useMemo(() => bindActionCreators(slice.actions, dispatch), [dispatch]);
   };
